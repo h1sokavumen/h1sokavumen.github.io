@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 27, title: 'Паки пуси - Пошлая Молли', artist: 'Артист 28', duration: '?:??', file: 'sound/28.mp3' },
         { id: 28, title: 'Священная война - Урал Гайсин', artist: 'Артист 29', duration: '?:??', file: 'sound/29.mp3' },
         { id: 29, title: '_bedwars_pro_', artist: 'Артист 30', duration: '?:??', file: 'sound/30.mp3' },
-        { id: 30, title: 'VIK.IGM', artist: 'Артист 31', duration: '?:??', file: 'sound/31.mp3' }
+        { id: 30, title: 'Новый трек 31', artist: 'Артист 31', duration: '?:??', file: 'sound/31.mp3' }
     ];
 
     // --- ПОИСК ЭЛЕМЕНТОВ DOM ---
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- ОСНОВНЫЕ ФУНКЦИИ ---
     function setLanguage(lang) { Object.keys(translations).forEach(key => { const el = document.querySelector(`[data-translate-key="${key}"]`); if(el && translations[key][lang]) el.textContent = translations[key][lang]; const pl = document.querySelector(`[data-translate-placeholder="${key}"]`); if(pl && translations[key][lang]) pl.placeholder = translations[key][lang]; }); }
     function switchView(viewKey) { Object.values(views).forEach(v => v.classList.remove('active-view')); views[viewKey].classList.add('active-view'); Object.values(navItems).forEach(i => i.classList.remove('active')); navItems[viewKey].classList.add('active'); }
-    function renderPlaylist(container, data) { container.innerHTML = ''; data.forEach(track => { const index = fullPlaylist.findIndex(p => p.id === track.id); const row = document.createElement('tr'); row.dataset.index = index; row.innerHTML = `<td>${index + 1}</td><td><div style="display:flex; align-items:center;"><img src="${albumCover}" width="40" height="40" style="margin-right:12px;"><div><div>${track.title}</div><div style="font-size:12px; color:var(--text-muted-color);">${track.artist}</div></div></div></td><td>${mainPlaylistTitle.textContent}</td><td>${track.duration}</td>`; container.appendChild(row); }); }
+    function renderPlaylist(container, data) { container.innerHTML = ''; data.forEach(track => { const index = fullPlaylist.findIndex(p => p.id === track.id); const row = document.createElement('tr'); row.dataset.index = index; row.innerHTML = `<td>${index + 1}</td><td><div style="display:flex; align-items:center;"><img src="${albumCover}" width="40" height="40" style="margin-right:12px;"><div><div>${track.title}</div><div style="font-size:12px; color:var(--text-muted-color);">${track.artist}</div></div></div></td><td>${track.artist}</td><td>${track.duration}</td>`; container.appendChild(row); }); }
     function performSearch() { const query = searchInput.value.toLowerCase(); if (!query) { searchResultsContainer.innerHTML = ''; return; } const results = fullPlaylist.filter(t => t.title.toLowerCase().includes(query) || t.artist.toLowerCase().includes(query)); const table = document.createElement('table'); table.className = 'song-table'; const tbody = document.createElement('tbody'); table.appendChild(tbody); searchResultsContainer.innerHTML = ''; searchResultsContainer.appendChild(table); renderPlaylist(tbody, results); }
     function loadTrack(trackIndex) { currentTrackIndex = trackIndex; const track = fullPlaylist[trackIndex]; musicPlayer.src = track.file; nowPlayingCover.src = track.id.toString().startsWith('user_') ? 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=' : albumCover; nowPlayingTitle.textContent = track.title; nowPlayingArtist.textContent = track.artist; document.title = `${track.title} · ${track.artist}`; }
     function play() { isPlaying = true; musicPlayer.play(); playPauseBtn.querySelector('.play-icon').style.display = 'none'; playPauseBtn.querySelector('.pause-icon').style.display = 'block'; }
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mainPlaylistTitle.addEventListener('blur', saveState);
         searchInput.addEventListener('input', performSearch);
         uploadInput.addEventListener('change', handleFileUpload);
-        playPauseBtn.addEventListener('click', () => isPlaying ? pause() : play()); prevBtn.addEventListener('click', prevTrack); nextBtn.addEventListener('click', nextTrack);
+        playPauseBtn.addEventListener('click', () => { if (fullPlaylist.length > 0) isPlaying ? pause() : play(); }); prevBtn.addEventListener('click', () => fullPlaylist.length > 0 && prevTrack()); nextBtn.addEventListener('click', () => fullPlaylist.length > 0 && nextTrack());
         musicPlayer.addEventListener('timeupdate', updateProgress); musicPlayer.addEventListener('ended', nextTrack);
         musicPlayer.addEventListener('loadedmetadata', () => { if (resumeTime) { musicPlayer.currentTime = resumeTime; resumeTime = 0; } updateProgress(); });
         volumeBar.addEventListener('input', e => { musicPlayer.volume = e.target.value / 100; });
