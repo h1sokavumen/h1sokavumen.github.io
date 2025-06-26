@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ᴀɢʀᴏʜɪꜱǫ - Web Player</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="spotify-container">
+        <!-- Левый сайдбар -->
+        <aside class="sidebar">
+            <div class="brand-title">ᴀɢʀᴏʜɪꜱǫ</div>
+            <nav class="main-nav">
+                <ul>
+                    <li id="nav-home" class="nav-item active"><a data-translate-key="home">Главная</a></li>
+                    <li id="nav-search" class="nav-item"><a data-translate-key="search">Поиск</a></li>
+                </ul>
+            </nav>
+            <button id="settings-btn" class="settings-btn" data-translate-key="settings">Настройки</button>
+        </aside>
+
+        <!-- Основное окно -->
+        <main class="main-content">
+            <header class="main-header"></header>
+            <div id="home-view" class="view active-view">
+                <section class="playlist-view">
+                    <div class="playlist-header">
+                        <img src="" alt="Album Cover" id="playlist-cover">
+                        <div class="playlist-details">
+                            <span class="playlist-type" data-translate-key="album">АЛЬБОМ</span>
+                            <!-- Добавляем возможность редактирования -->
+                            <h1 id="playlist-title" contenteditable="true">Загрузка...</h1>
+                        </div>
+                    </div>
+                    <div class="song-list-container">
+                        <table class="song-table">
+                            <thead><tr><th>#</th><th data-translate-key="title">НАЗВАНИЕ</th><th data-translate-key="album">АЛЬБОМ</th><th>🕒</th></tr></thead>
+                            <tbody id="song-list-body"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+            <div id="search-view" class="view">
+                <div class="search-bar-container">
+                    <input type="text" id="search-input" data-translate-placeholder="search_placeholder">
+                </div>
+                <div id="search-results-container"></div>
+            </div>
+        </main>
+
+        <!-- Нижний плеер -->
+        <footer class="player-bar"></footer>
+    </div>
+    
+    <!-- Модальное окно настроек -->
+    <div id="settings-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 data-translate-key="settings">Настройки</h2>
+            <div class="setting-item">
+                <span data-translate-key="theme">Тема</span>
+                <div class="theme-switch-wrapper"><span data-translate-key="light">Светлая</span><label class="theme-switch"><input type="checkbox" id="theme-toggle"><span class="slider round"></span></label><span data-translate-key="dark">Тёмная</span></div>
+            </div>
+            <div class="setting-item">
+                <span data-translate-key="language">Язык</span>
+                <select id="language-selector"><option value="ru">Русский</option><option value="ua">Українська</option></select>
+            </div>
+            <button id="close-modal-btn" data-translate-key="close">Закрыть</button>
+        </div>
+    </div>
+    
+    <audio id="music-player"></audio>
+    <script src="script.js"></script>
+</body>
+</html>
