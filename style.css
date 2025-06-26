@@ -15,13 +15,14 @@ body { margin: 0; font-family: 'Montserrat', sans-serif; color: var(--text-color
 
 /* --- ОСНОВНОЕ ОКНО --- */
 .main-content { grid-area: main-content; background: var(--main-bg-color); overflow-y: auto; transition: background-color 0.3s;}
-.main-header { display: flex; justify-content: flex-end; align-items: center; height: 60px; padding: 0 32px; position: sticky; top: 0; z-index: 5;}
+/* ИСПРАВЛЕНИЕ: Шапка теперь не имеет высоты по умолчанию и не блокирует клики на ПК */
+.main-header { display: flex; justify-content: flex-end; align-items: center; padding: 0 32px; position: sticky; top: 0; z-index: 5;}
 .settings-btn-mobile { display: none; background: none; border: none; color: var(--text-muted-color); cursor: pointer; }
 .settings-btn-mobile svg { width: 24px; height: 24px; }
 .view { display: none; padding: 0 32px; }
 .view.active-view { display: block; }
-.playlist-view { padding: 0; }
-.playlist-header { display: flex; align-items: flex-end; gap: 24px; padding-top: 24px; }
+.playlist-view { padding-top: 24px; } /* Добавим отступ сверху вместо шапки */
+.playlist-header { display: flex; align-items: flex-end; gap: 24px; }
 .playlist-header img { width: 230px; height: 230px; object-fit: cover; box-shadow: 0 4px 60px rgba(0,0,0,0.5); }
 .playlist-details h1 { font-size: 5rem; margin: 8px 0; letter-spacing: -4px; cursor: pointer;}
 .playlist-details h1[contenteditable="true"]:focus { outline: 2px solid var(--accent-color); background-color: var(--hover-color); border-radius: 8px;}
@@ -32,7 +33,7 @@ body { margin: 0; font-family: 'Montserrat', sans-serif; color: var(--text-color
 .song-table tbody tr:hover { background-color: var(--hover-color); }
 
 /* --- ПОИСК --- */
-.search-bar-container { padding: 16px 0; }
+.search-bar-container { padding: 24px 0; }
 #search-input { width: 100%; max-width: 400px; padding: 14px 20px; border-radius: 50px; border: 1px solid transparent; font-size: 16px; background-color: var(--hover-color); color: var(--text-color);}
 #search-input:focus { outline: none; border-color: var(--text-muted-color);}
 
@@ -86,8 +87,10 @@ input:checked + .slider:before { transform: translateX(26px); }
     .spotify-container { grid-template-columns: 1fr; grid-template-areas: "main-content" "player-bar"; }
     .sidebar { display: none; }
     .view { padding: 0 16px; }
-    .main-header { justify-content: flex-end; }
+    /* ИСПРАВЛЕНИЕ: Даем шапке высоту, чтобы кнопка настроек была видна */
+    .main-header { height: 60px; }
     .settings-btn-mobile { display: block; }
+    .playlist-view { padding-top: 0; } /* Убираем лишний отступ */
     .playlist-header { flex-direction: column; align-items: center; text-align: center; gap: 16px; }
     .playlist-header img { width: 180px; height: 180px; }
     .playlist-details h1 { font-size: 2.5rem; letter-spacing: -2px; }
