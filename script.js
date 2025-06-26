@@ -49,8 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 26, title: 'Нон стоп - Пошлая Молли', artist: 'Артист 27', duration: '?:??', file: 'sound/27.mp3' },
         { id: 27, title: 'Паки пуси - Пошлая Молли', artist: 'Артист 28', duration: '?:??', file: 'sound/28.mp3' },
         { id: 28, title: 'Священная война - Урал Гайсин', artist: 'Артист 29', duration: '?:??', file: 'sound/29.mp3' },
-        // ++ ВОТ ВАШ НОВЫЙ ТРЕК ++
-        { id: 29, title: '_bedwars_pro_', artist: 'Артист 30', duration: '?:??', file: 'sound/30.mp3' }
+        { id: 29, title: '_bedwars_pro_', artist: 'Артист 30', duration: '?:??', file: 'sound/30.mp3' },
+        // ++ ВОТ ВАШ НОВЫЙ 31-й ТРЕК ++
+        { id: 30, title: 'VIK.IMG', artist: 'Артист 31', duration: '?:??', file: 'sound/31.mp3' }
     ];
     
     // Остальной код остается без изменений, он будет работать с новыми данными
