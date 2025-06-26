@@ -32,13 +32,12 @@
                         <img src="" alt="Album Cover" id="playlist-cover">
                         <div class="playlist-details">
                             <span class="playlist-type" data-translate-key="album">АЛЬБОМ</span>
-                            <!-- Добавляем возможность редактирования -->
                             <h1 id="playlist-title" contenteditable="true">Загрузка...</h1>
                         </div>
                     </div>
                     <div class="song-list-container">
                         <table class="song-table">
-                            <thead><tr><th>#</th><th data-translate-key="title">НАЗВАНИЕ</th><th data-translate-key="album">АЛЬБОМ</th><th>🕒</th></tr></thead>
+                            <thead><tr><th>#</th><th data-translate-key="title">НАЗВАНИЕ</th><th data-translate-key="artist_col">АРТИСТ</th><th>🕒</th></tr></thead>
                             <tbody id="song-list-body"></tbody>
                         </table>
                     </div>
@@ -52,7 +51,7 @@
             </div>
         </main>
 
-        <!-- Нижний плеер -->
+        <!-- Нижний плеер (будет создан через JS) -->
         <footer class="player-bar"></footer>
     </div>
     

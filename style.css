@@ -18,10 +18,10 @@ body { margin: 0; font-family: 'Montserrat', sans-serif; color: var(--text-color
 .playlist-header { display: flex; align-items: flex-end; gap: 24px; padding-top: 24px; }
 .playlist-header img { width: 230px; height: 230px; object-fit: cover; box-shadow: 0 4px 60px rgba(0,0,0,0.5); }
 .playlist-details h1 { font-size: 5rem; margin: 8px 0; letter-spacing: -4px; cursor: pointer;}
-/* Стиль для редактируемого заголовка */
 .playlist-details h1[contenteditable="true"]:focus { outline: 2px solid var(--accent-color); background-color: var(--hover-color); border-radius: 8px;}
 .song-table { width: 100%; border-collapse: collapse; margin-top: 32px;}
 .song-table th, .song-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
+.song-table th { color: var(--text-muted-color); font-size: 12px; }
 .song-table tbody tr { cursor: pointer; border-radius: 4px; transition: background-color 0.2s; }
 .song-table tbody tr:hover { background-color: var(--hover-color); }
 .search-bar-container { padding: 16px 0; }
@@ -43,9 +43,9 @@ body { margin: 0; font-family: 'Montserrat', sans-serif; color: var(--text-color
 .control-btn.play:hover { transform: scale(1.05); }
 .control-btn.play svg { width: 16px; height: 16px; }
 .player-controls-right { display: flex; justify-content: flex-end; align-items: center; gap: 8px; min-width: 180px; width: 30%;}
-.volume-icon { display: none; /* Убираем иконку громкости */ }
+.volume-icon { display: none; }
 input[type="range"] { -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer; flex-grow: 1; }
-.volume-bar { max-width: 120px; /* Немного увеличим для удобства */}
+.volume-bar { max-width: 120px; }
 input[type="range"]::-webkit-slider-runnable-track { background: #4d4d4d; height: 4px; border-radius: 2px; }
 input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; height: 12px; width: 12px; background-color: var(--text-color); border-radius: 50%; margin-top: -4px; }
 input[type="range"]:hover::-webkit-slider-runnable-track { background: var(--accent-color); }
