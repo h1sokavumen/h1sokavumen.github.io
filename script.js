@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const defaultPlaylistTitle = 'Хиты ᴀɢʀᴏʜɪꜱǫ';
     const albumCover = 'images/cover1.jpg';
     const basePlaylist = [
-        // Ваш список из 31 песни
         { id: 0, title: '11 - Кишлак', artist: 'Артист 1', duration: '?:??', file: 'sound/1.mp3' },
         { id: 1, title: '104972edf8590', artist: 'Артист 2', duration: '?:??', file: 'sound/2.mp3' },
         { id: 2, title: '1049728590', artist: 'Артист 3', duration: '?:??', file: 'sound/3.mp3' },
@@ -45,10 +44,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- ПОИСК ЭЛЕМЕНТОВ DOM ---
     const musicPlayer = document.getElementById('music-player'), playerBar = document.querySelector('.player-bar'), songListBody = document.getElementById('song-list-body'), mainPlaylistCover = document.getElementById('playlist-cover'), mainPlaylistTitle = document.getElementById('playlist-title'), navItems = { home: document.getElementById('nav-home'), search: document.getElementById('nav-search') }, views = { home: document.getElementById('home-view'), search: document.getElementById('search-view') }, searchInput = document.getElementById('search-input'), searchResultsContainer = document.getElementById('search-results-container'), settingsModal = document.getElementById('settings-modal'), closeModalBtn = document.getElementById('close-modal-btn'), settingsBtnDesktop = document.getElementById('settings-btn-desktop'), settingsBtnMobile = document.getElementById('settings-btn-mobile'), themeToggle = document.getElementById('theme-toggle'), languageSelector = document.getElementById('language-selector'), uploadInput = document.getElementById('upload-input'), uploadMessage = document.getElementById('upload-message');
     let fullPlaylist = [], currentTrackIndex = 0, isPlaying = false, resumeTime = 0, playPauseBtn, prevBtn, nextBtn, progressBar, volumeBar, currentTimeEl, totalDurationEl, nowPlayingCover, nowPlayingTitle, nowPlayingArtist;
+    let deviceId, STATE_KEY, USER_TRACKS_KEY;
 
     // --- УПРАВЛЕНИЕ НАСТРОЙКАМИ И СОСТОЯНИЕМ ---
-    function saveState() { const state = { theme: document.body.classList.contains('light-theme') ? 'light' : 'dark', language: languageSelector.value, playlistTitle: mainPlaylistTitle.textContent, lastTrackIndex: currentTrackIndex, lastTrackTime: isPlaying ? musicPlayer.currentTime : resumeTime }; localStorage.setItem('agrohisq_state', JSON.stringify(state)); }
-    function loadState() { const savedState = JSON.parse(localStorage.getItem('agrohisq_state')), defaultState = { theme: 'dark', language: 'ru', playlistTitle: defaultPlaylistTitle, lastTrackIndex: 0, lastTrackTime: 0 }, state = { ...defaultState, ...savedState }, userTracks = JSON.parse(localStorage.getItem('agrohisq_user_tracks')) || []; fullPlaylist = [...basePlaylist, ...userTracks]; document.body.classList.toggle('light-theme', state.theme === 'light'); themeToggle.checked = state.theme === 'dark'; languageSelector.value = state.language; mainPlaylistTitle.textContent = state.playlistTitle; currentTrackIndex = state.lastTrackIndex; resumeTime = state.lastTrackTime; setLanguage(state.language); }
+    function getDeviceId() {
+        let id = localStorage.getItem('agrohisq_deviceId');
+        if (!id) {
+            id = 'device_' + Date.now() + Math.random().toString(36).substring(2, 9);
+            localStorage.setItem('agrohisq_deviceId', id);
+        }
+        return id;
+    }
+
+    function saveState() {
+        const state = { theme: document.body.classList.contains('light-theme') ? 'light' : 'dark', language: languageSelector.value, playlistTitle: mainPlaylistTitle.textContent, lastTrackIndex: currentTrackIndex, lastTrackTime: isPlaying ? musicPlayer.currentTime : resumeTime };
+        localStorage.setItem(STATE_KEY, JSON.stringify(state));
+    }
+
+    function loadState() {
+        const savedState = JSON.parse(localStorage.getItem(STATE_KEY)), defaultState = { theme: 'dark', language: 'ru', playlistTitle: defaultPlaylistTitle, lastTrackIndex: 0, lastTrackTime: 0 }, state = { ...defaultState, ...savedState };
+        const userTracks = JSON.parse(localStorage.getItem(USER_TRACKS_KEY)) || [];
+        fullPlaylist = [...basePlaylist, ...userTracks];
+        document.body.classList.toggle('light-theme', state.theme === 'light');
+        themeToggle.checked = state.theme === 'dark';
+        languageSelector.value = state.language;
+        mainPlaylistTitle.textContent = state.playlistTitle;
+        currentTrackIndex = state.lastTrackIndex;
+        resumeTime = state.lastTrackTime;
+        setLanguage(state.language);
+    }
     
     // --- ЗАГРУЗКА ФАЙЛОВ ---
     function handleFileUpload(event) {
@@ -58,8 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const reader = new FileReader();
         reader.onload = (e) => {
             const dataUrl = e.target.result, newTrack = { id: `user_${Date.now()}`, title: file.name.replace('.mp3', ''), artist: 'Локальный файл', duration: '?:??', file: dataUrl };
-            let userTracks = JSON.parse(localStorage.getItem('agrohisq_user_tracks')) || [];
-            userTracks.push(newTrack); localStorage.setItem('agrohisq_user_tracks', JSON.stringify(userTracks));
+            let userTracks = JSON.parse(localStorage.getItem(USER_TRACKS_KEY)) || [];
+            userTracks.push(newTrack); localStorage.setItem(USER_TRACKS_KEY, JSON.stringify(userTracks));
             uploadMessage.textContent = `Трек "${newTrack.title}" успешно добавлен!`; uploadInput.value = '';
             fullPlaylist = [...basePlaylist, ...userTracks]; renderPlaylist(songListBody, fullPlaylist);
         };
@@ -72,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function switchView(viewKey) { Object.values(views).forEach(v => v.classList.remove('active-view')); views[viewKey].classList.add('active-view'); Object.values(navItems).forEach(i => i.classList.remove('active')); navItems[viewKey].classList.add('active'); }
     function renderPlaylist(container, data) { container.innerHTML = ''; data.forEach(track => { const index = fullPlaylist.findIndex(p => p.id === track.id); const row = document.createElement('tr'); row.dataset.index = index; row.innerHTML = `<td>${index + 1}</td><td><div style="display:flex; align-items:center;"><img src="${albumCover}" width="40" height="40" style="margin-right:12px;"><div><div>${track.title}</div><div style="font-size:12px; color:var(--text-muted-color);">${track.artist}</div></div></div></td><td>${track.artist}</td><td>${track.duration}</td>`; container.appendChild(row); }); }
     function performSearch() { const query = searchInput.value.toLowerCase(); if (!query) { searchResultsContainer.innerHTML = ''; return; } const results = fullPlaylist.filter(t => t.title.toLowerCase().includes(query) || t.artist.toLowerCase().includes(query)); const table = document.createElement('table'); table.className = 'song-table'; const tbody = document.createElement('tbody'); table.appendChild(tbody); searchResultsContainer.innerHTML = ''; searchResultsContainer.appendChild(table); renderPlaylist(tbody, results); }
-    function loadTrack(trackIndex) { currentTrackIndex = trackIndex; const track = fullPlaylist[trackIndex]; musicPlayer.src = track.file; nowPlayingCover.src = track.id.toString().startsWith('user_') ? 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=' : albumCover; nowPlayingTitle.textContent = track.title; nowPlayingArtist.textContent = track.artist; document.title = `${track.title} · ${track.artist}`; }
+    function loadTrack(trackIndex) { if(trackIndex >= fullPlaylist.length || trackIndex < 0) trackIndex = 0; currentTrackIndex = trackIndex; const track = fullPlaylist[trackIndex]; musicPlayer.src = track.file; nowPlayingCover.src = track.id.toString().startsWith('user_') ? 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=' : albumCover; nowPlayingTitle.textContent = track.title; nowPlayingArtist.textContent = track.artist; document.title = `${track.title} · ${track.artist}`; }
     function play() { isPlaying = true; musicPlayer.play(); playPauseBtn.querySelector('.play-icon').style.display = 'none'; playPauseBtn.querySelector('.pause-icon').style.display = 'block'; }
     function pause() { isPlaying = false; musicPlayer.pause(); resumeTime = musicPlayer.currentTime; playPauseBtn.querySelector('.play-icon').style.display = 'block'; playPauseBtn.querySelector('.pause-icon').style.display = 'none'; }
     function prevTrack() { const newIndex = (currentTrackIndex - 1 + fullPlaylist.length) % fullPlaylist.length; loadTrack(newIndex); play(); }
@@ -81,14 +105,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ---
     function init() {
+        deviceId = getDeviceId();
+        STATE_KEY = `agrohisq_state_${deviceId}`;
+        USER_TRACKS_KEY = `agrohisq_user_tracks_${deviceId}`;
+
         playerBar.innerHTML = `<div class="now-playing"><img src="" alt="Now Playing" id="now-playing-cover"><div class="track-info"><div id="now-playing-title"></div><div id="now-playing-artist"></div></div></div><div class="player-controls-center"><div class="player-buttons"><button class="control-btn shuffle"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M14.83,13.41L13.42,14.82L16.24,17.65L14.83,19.06L17.66,21.89L19.07,20.47L14.83,16.23M19.07,3.53L17.66,2.11L14.83,4.94L16.24,6.35L19.07,3.53M7.06,8.5L8.5,7.05L12.7,11.25L7.05,16.9L5.64,15.47L9.85,11.25L7.06,8.5M17.65,11.26L16.24,12.67L14.83,11.26L13.42,12.67L10.59,9.84L12,8.42L16.24,12.67L17.65,11.26Z" /></svg></button><button id="prev-btn" class="control-btn"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6,18V6H8V18H6M9.5,12L18,6V18L9.5,12Z" /></svg></button><button id="play-pause-btn" class="control-btn play"><svg class="play-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z" /></svg><svg class="pause-icon" viewBox="0 0 24 24" style="display:none;"><path fill="currentColor" d="M14,19H18V5H14M6,19H10V5H6V19Z" /></svg></button><button id="next-btn" class="control-btn"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M16,18H18V6H16M6,18L14.5,12L6,6V18Z" /></svg></button><button class="control-btn repeat"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M17,17H7V14L3,18L7,22V19H19V13H17M7,7H17V10L21,6L17,2V5H5V11H7V7Z" /></svg></button></div><div class="progress-container-main"><span id="current-time" class="time">0:00</span><input type="range" id="progress-bar" class="progress-bar" value="0"><span id="total-duration" class="time">0:00</span></div></div><div class="player-controls-right"><span class="volume-icon"></span><input type="range" id="volume-bar" class="volume-bar" value="100"></div>`;
         playPauseBtn = document.getElementById('play-pause-btn'); prevBtn = document.getElementById('prev-btn'); nextBtn = document.getElementById('next-btn'); progressBar = document.getElementById('progress-bar'); volumeBar = document.getElementById('volume-bar'); currentTimeEl = document.getElementById('current-time'); totalDurationEl = document.getElementById('total-duration'); nowPlayingCover = document.getElementById('now-playing-cover'); nowPlayingTitle = document.getElementById('now-playing-title'); nowPlayingArtist = document.getElementById('now-playing-artist');
         loadState(); mainPlaylistCover.src = albumCover; renderPlaylist(songListBody, fullPlaylist);
-        if (fullPlaylist.length > 0 && currentTrackIndex < fullPlaylist.length) loadTrack(currentTrackIndex);
+        if (fullPlaylist.length > 0) loadTrack(currentTrackIndex);
         navItems.home.addEventListener('click', () => switchView('home')); navItems.search.addEventListener('click', () => switchView('search'));
         settingsBtnDesktop.addEventListener('click', () => settingsModal.classList.add('show')); settingsBtnMobile.addEventListener('click', () => settingsModal.classList.add('show'));
         closeModalBtn.addEventListener('click', () => settingsModal.classList.remove('show')); window.addEventListener('click', e => { if (e.target === settingsModal) settingsModal.classList.remove('show'); });
-        themeToggle.addEventListener('change', () => { applyTheme(themeToggle.checked ? 'dark' : 'light'); saveState(); });
+        themeToggle.addEventListener('change', () => { document.body.classList.toggle('light-theme', !themeToggle.checked); saveState(); });
         languageSelector.addEventListener('change', () => { setLanguage(languageSelector.value); saveState(); });
         mainPlaylistTitle.addEventListener('blur', saveState);
         searchInput.addEventListener('input', performSearch);
