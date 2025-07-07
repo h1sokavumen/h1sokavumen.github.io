@@ -5,7 +5,41 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- ОБНОВЛЕННАЯ ЛОГИКА МУЗЫКАЛЬНОГО ПЛЕЕРА ---
     const trackFileFormat = 'mp3'; const coverFileFormat = 'jpg';
     const playlist = [
-        { artist: "tg", title: "саунд трэп #1" }, { artist: "tg", title: "саунд трэп #2" }, { artist: "tg", title: "саунд трэп #3" }, { artist: "tg", title: "саунд трэп #4" }, { artist: "tg", title: "саунд трэп #5" }, { artist: "tg", title: "саунд трэп #6" }, { artist: "tg", title: "саунд трэп #7" }, { artist: "tg", title: "саунд трэп #8" }, { artist: "tg", title: "саунд трэп #9" }, { artist: "tg", title: "саунд трэп #10" },
+      const playlist = [
+        { artist: "11", title: "11" },
+        { artist: "Alavys", title: "Трать мои бабосы" },
+        { artist: "CUPSIZE", title: "Юра, Юра" },
+        { artist: "dabbackwood", title: "марафеты" },
+        { artist: "dj trippie", title: "flameboy - b0lit" },
+        { artist: "Enina", title: "кончил" },
+        { artist: "enveel", title: "Призрак" },
+        { artist: "Bushido zho", title: "Дай мне посмотреть" },
+        { artist: "Kempel", title: "Тема Е" },
+        { artist: "KERASINN", title: "Купидон" },
+        { artist: "Lida", title: "Серега Пират - ЧСВ" },
+        { artist: "madk1d", title: "Барыга" },
+        { artist: "Measora", title: "кисы - котики" },
+        { artist: "nnoluvv", title: "Пошлая Блондинка" },
+        { artist: "ooes", title: "зима" },
+        { artist: "Playboi", title: "Carti - Miss the Rage" },
+        { artist: "Playboi", title: "Carti-Sky" },
+        { artist: "The Black Eyed Peas", title: "Rock That Body" },
+        { artist: "whitek3d", title: "Катюха" },
+        { artist: "А чё чё", title: "Бьянка" },
+        { artist: "Валентин", title: "Стрыкло_Песня_для_девочек" },
+        { artist: "Канги,_mzlff,", title: "STED_D_Буря,_метель_и_мгла" },
+        { artist: "Контракт,", title: " - Пошлая Молли" },
+        { artist: "Кузнецкий Сквад", title: "Клубника" },
+        { artist: "Мулен Руж", title: "Бьянка" },
+        { artist: "Пасош-я", title: "очень устал" },
+        { artist: "Пачка", title: " сигарет - В Цой Кино" },
+        { artist: "Пошлая Молли", title: "Нон стоп" },
+        { artist: "Пошлая Молли", title: "Паки пуси" },
+        { artist: "просто лера", title: "Мне 20" },
+        { artist: "урал гайсин", title: "священный война" },
+        { artist: "ФРЕНДЗОНА", title: "Психолог" },
+        { artist: "Юпи, FORTUNA 812", title: "Не думаю" },
+        { artist: "Бонд с кнопкой", title: "Кухни" },
     ];
     
     // Элементы плеера
