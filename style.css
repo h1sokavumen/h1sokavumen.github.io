@@ -137,4 +137,5 @@ h1 {
 .snowflake:nth-child(7) { left: 65%; animation-duration: 8s; animation-delay: 0s; }
 .snowflake:nth-child(8) { left: 75%; animation-duration: 14s; animation-delay: 2s; font-size: 1.6em;}
 .snowflake:nth-child(9) { left: 85%; animation-duration: 9s; animation-delay: 4s; }
+
 .snowflake:nth-child(10) { left: 90%; animation-duration: 11s; animation-delay: 1s; font-size: 1.3em;}
