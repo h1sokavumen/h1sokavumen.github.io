@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="status-card">
+        <h2>Статус вашей анкеты</h2>
+        <p><strong>Текущий статус:</strong> 
+            {% if submission.status == 'pending' %}
+                На рассмотрении... ⏳
+            {% elif submission.status == 'accepted' %}
+                Принята! 🎉
+            {% elif submission.status == 'rejected' %}
+                Отклонена 😢
+            {% elif submission.status == 'resubmit' %}
+                Требуется пересдача ✏️
+            {% endif %}
+        </p>
+        
+        {% if submission.admin_message %}
+            <div class="message-from-admin">
+                <h3>Сообщение от администрации:</h3>
+                <p>{{ submission.admin_message }}</p>
+            </div>
+        {% endif %}
+
+        {% if submission.status == 'resubmit' %}
+            <a href="{{ url_for('anketa') }}" class="button">Перезаполнить анкету</a>
+        {% endif %}
+    </div>
+{% endblock %}

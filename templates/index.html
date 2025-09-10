@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Добро пожаловать в ABS-LT!</h1>
+    <p>Создаём будущее вместе с вами.</p>
+
+    <div class="ad-block" style="margin-bottom: 30px;">
+        <h3>Подача анкеты для начинающих</h3>
+        <p>Хотите стать частью нашей команды? Начните свой путь с нами!</p>
+        <a href="{{ url_for('anketa') }}" class="button">Заполнить анкету</a>
+    </div>
+
+    <div class="ad-block">
+        <h3>Сообщество разработчиков</h3>
+        <p>{{ ad_message }}</p>
+        <p>
+            <a href="{{ telegram_link }}" target="_blank">
+                <img src="{{ url_for('static', filename='telegram_logo.png') }}" alt="Telegram" class="icon">
+                <span>Telegram</span>
+            </a>
+            <a href="{{ discord_link }}" target="_blank">
+                <img src="{{ url_for('static', filename='discord_logo.png') }}" alt="Discord" class="icon">
+                <span>Discord</span>
+            </a>
+        </p>
+    </div>
+{% endblock %}

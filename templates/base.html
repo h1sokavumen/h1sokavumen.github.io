@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ABS-LT</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="{{ url_for('home') }}">Главная</a>
+            {% if 'username' in session %}
+                <a href="{{ url_for('premium_page') }}">Премиум</a>
+                <a href="{{ url_for('logout') }}">Выйти ({{ session['username'] }})</a>
+            {% else %}
+                <a href="{{ url_for('register') }}">Регистрация</a>
+                <a href="{{ url_for('login') }}">Вход</a>
+            {% endif %}
+        </nav>
+    </header>
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flashes">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

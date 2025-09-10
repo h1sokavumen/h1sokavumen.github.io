@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Анкета для начинающих</h2>
+    <p>Мы ищем людей, увлечённых программированием, для нашего сообщества. Заполните анкету, чтобы мы могли познакомиться с вами!</p>
+    <form action="{{ url_for('submit_anketa') }}" method="post">
+        <label for="name">Ваше имя:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
+        
+        <label for="telegram">Ник в Telegram:</label><br>
+        <input type="text" id="telegram" name="telegram" required><br><br>
+        
+        <label for="experience">Ваш опыт в программировании:</label><br>
+        <select id="experience" name="experience">
+            <option value="Начинающий">Начинающий (изучаю основы)</option>
+            <option value="Средний">Средний (есть небольшие проекты)</option>
+            <option value="Продвинутый">Продвинутый (работаю на заказ)</option>
+        </select><br><br>
+        
+        <label for="goals">Ваши цели (кратко):</label><br>
+        <textarea id="goals" name="goals" rows="4" required></textarea><br><br>
+        
+        <button type="submit">Отправить анкету</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Список анкет</h2>
+    {% if submissions %}
+        <div class="anketa-list-container">
+            {% for submission in submissions %}
+                <div class="anketa-card {% if submission.priority == 'High' %} priority-card {% endif %}">
+                    <h3>Анкета от: {{ submission.user }}</h3>
+                    <p><strong>Имя:</strong> {{ submission.name }}</p>
+                    <p><strong>Ник в Telegram:</strong> {{ submission.telegram }}</p>
+                    <p><strong>Опыт:</strong> {{ submission.experience }}</p>
+                    <p><strong>Цели:</strong> {{ submission.goals }}</p>
+                    <p><strong>Статус:</strong> {{ submission.status }}</p>
+                    <p><strong>Приоритет:</strong> {{ submission.priority }}</p>
+                    <p><strong>ID анкеты:</strong> {{ submission.id }}</p>
+                    
+                    {% if submission.status == 'pending' %}
+                        <div class="admin-actions">
+                            <a href="{{ url_for('accept_anketa', submission_id=submission.id) }}" class="button green">Принять</a>
+                            <a href="{{ url_for('reject_anketa', submission_id=submission.id) }}" class="button red">Отклонить</a>
+                            <a href="{{ url_for('resubmit_anketa', submission_id=submission.id) }}" class="button yellow">Пересдать</a>
+                        </div>
+                    {% else %}
+                        <p><strong>Последнее сообщение:</strong> {{ submission.admin_message }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Пока что нет ни одной анкеты.</p>
+    {% endif %}
+{% endblock %}

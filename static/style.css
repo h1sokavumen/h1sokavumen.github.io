@@ -1,0 +1,241 @@
+/* Основные стили */
+body {
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding-top: 50px;
+    margin: 0;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Стили для навигации */
+nav {
+    display: flex;
+    justify-content: center;
+    background-color: #333;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+nav a {
+    color: white;
+    padding: 14px 20px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+nav a:hover {
+    background-color: #575757;
+}
+
+/* Стили для сообщений (flash messages) */
+.flashes {
+    list-style-type: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.flashes li {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+/* Стили для блоков с рекламой и анкетой */
+.ad-block {
+    margin-top: 30px;
+    padding: 25px;
+    background-color: #e9f0ff;
+    border-radius: 10px;
+    border-left: 5px solid #007bff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.ad-block h3 {
+    margin-top: 0;
+    color: #0056b3;
+    font-size: 1.5em;
+}
+
+.ad-block p {
+    color: #666;
+    line-height: 1.5;
+}
+
+.ad-block a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    margin: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    transition: color 0.3s;
+}
+
+.ad-block a:hover {
+    color: #0056b3;
+}
+
+.ad-block .icon {
+    width: 28px;
+    height: 28px;
+    margin-right: 8px;
+}
+
+/* Стили для кнопок */
+.button, button {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 25px;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    display: inline-block;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.button:hover, button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+/* Стили для форм */
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+label {
+    margin-top: 15px;
+    font-weight: bold;
+    color: #555;
+    font-size: 1.1em;
+}
+
+input[type="text"], input[type="password"], textarea, select {
+    width: 80%;
+    padding: 12px;
+    margin-top: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* Стили для списка анкет (админ-панель) */
+.anketa-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: left;
+}
+
+.anketa-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.anketa-card h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.anketa-card p strong {
+    color: #555;
+}
+
+.admin-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.button.green {
+    background-color: #28a745;
+}
+
+.button.green:hover {
+    background-color: #218838;
+}
+
+.button.red {
+    background-color: #dc3545;
+}
+
+.button.red:hover {
+    background-color: #c82333;
+}
+
+.button.yellow {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.button.yellow:hover {
+    background-color: #e0a800;
+}
+
+/* Стили для карточек приоритетных анкет */
+.priority-card {
+    border: 2px solid gold;
+    background-color: #fff9e6;
+    box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+}
+
+/* Стили для страницы статуса анкеты */
+.status-card {
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    max-width: 600px;
+    margin: 40px auto;
+}
+
+.status-card h2 {
+    color: #333;
+    font-size: 2em;
+}
+
+.message-from-admin {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    background-color: #f7f7f7;
+    text-align: left;
+}
+
+.message-from-admin h3 {
+    margin-top: 0;
+}
