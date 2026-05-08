@@ -1,0 +1,14 @@
+{
+  "maloshko": {
+    "password": "ddac4c65cfc5b8c76e6d6f2d5c94935214a6734b3519088d22901d62c9ae160f",
+    "subscription": true,
+    "admin": true,
+    "created": "2026-05-08T11:37:26.411204"
+  },
+  "maloshkos": {
+    "password": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918",
+    "subscription": true,
+    "admin": false,
+    "created": "2026-05-08T11:37:26.413113"
+  }
+}

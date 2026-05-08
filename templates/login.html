@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Вход — CodeLearn{% endblock %}
+{% block extra_style %}
+.auth-wrap {
+  min-height:calc(100vh - 64px);
+  display:flex;align-items:center;justify-content:center;padding:2rem;
+}
+.auth-card {
+  width:100%;max-width:400px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:24px;padding:2.5rem;position:relative;overflow:hidden;
+}
+.auth-card::before {
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--grad);
+}
+.auth-title { font-size:1.8rem;font-weight:800;margin-bottom:0.4rem;letter-spacing:-0.03em; }
+.auth-sub { color:var(--muted);font-size:0.9rem;margin-bottom:2rem; }
+.field { margin-bottom:1.2rem; }
+.field label {
+  display:block;font-size:0.82rem;font-weight:700;
+  color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.5rem;
+}
+.field input {
+  width:100%;padding:0.8rem 1rem;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);
+  font-family:'Syne',sans-serif;font-size:0.95rem;
+  transition:all 0.2s;outline:none;
+}
+.field input:focus { border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,58,237,0.15); }
+.submit-btn {
+  width:100%;padding:0.9rem;
+  background:var(--grad);color:#fff;
+  border:none;border-radius:10px;
+  font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;
+  cursor:pointer;transition:all 0.2s;
+  box-shadow:0 4px 20px rgba(124,58,237,0.35);
+}
+.submit-btn:hover { transform:translateY(-1px); }
+.submit-btn:disabled { opacity:0.5;cursor:not-allowed;transform:none; }
+.auth-footer { text-align:center;margin-top:1.5rem;color:var(--muted);font-size:0.88rem; }
+.auth-footer a { color:var(--purple-light);text-decoration:none;font-weight:700; }
+.error-msg {
+  background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);
+  color:#fca5a5;border-radius:8px;padding:0.7rem 1rem;
+  font-size:0.88rem;margin-bottom:1rem;display:none;
+}
+{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-title">С возвращением 🔑</div>
+    <div class="auth-sub">Войди в свой аккаунт CodeLearn</div>
+    <div class="error-msg" id="errMsg"></div>
+    <div class="field">
+      <label>Имя пользователя</label>
+      <input type="text" id="username" placeholder="твой логин" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Пароль</label>
+      <input type="password" id="password" placeholder="••••••••">
+    </div>
+    <button class="submit-btn" id="submitBtn" onclick="doLogin()">Войти</button>
+    <div class="auth-footer">
+      Нет аккаунта? <a href="/register">Зарегистрироваться</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function doLogin() {
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value.trim();
+  const err = document.getElementById('errMsg');
+  err.style.display = 'none';
+  if (!u || !p) { showErr('Заполни все поля'); return; }
+  document.getElementById('submitBtn').disabled = true;
+  const res = await fetch('/login', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({username:u, password:p})
+  });
+  const data = await res.json();
+  if (!data.ok) {
+    showErr(data.msg);
+    document.getElementById('submitBtn').disabled = false;
+  } else {
+    window.location.href = data.admin ? '/admin' : '/';
+  }
+}
+function showErr(msg) {
+  const e = document.getElementById('errMsg');
+  e.textContent = msg; e.style.display = 'block';
+}
+document.addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+</script>
+{% endblock %}
