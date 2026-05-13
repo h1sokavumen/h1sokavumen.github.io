@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NovaCapture — Твой идеальный захват экрана</title>
+    <title>NovaCapture — Multi-Platform Screen Recorder</title>
     <meta http-equiv="refresh" content="1500">
     
     <style>
         :root {
             --accent: #a78bfa;
             --accent-elite: #fbbf24;
-            --bg: #0a0a0c;
+            --bg: #08080a;
             --glass: rgba(255, 255, 255, 0.03);
             --border: rgba(255, 255, 255, 0.08);
-            --white-ui: #f8fafc;
+            --linux-color: #fca5a5;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
 
         body {
             background-color: var(--bg);
@@ -25,335 +25,322 @@
             scroll-behavior: smooth;
         }
 
+        /* --- ГЛОБАЛЬНЫЙ ГРАДИЕНТ --- */
+        .glow-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 80% 20%, #1e1b4b 0%, transparent 40%),
+                        radial-gradient(circle at 20% 80%, #2e1065 0%, transparent 40%);
+            z-index: -1;
+        }
+
         /* --- ПРЕЛОАДЕР --- */
         #loader {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #050505;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 10000; transition: opacity 0.8s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #050505; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; z-index: 10000; transition: 0.8s;
         }
         .spinner {
-            width: 60px; height: 60px;
-            border: 3px solid transparent;
-            border-top: 3px solid var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            width: 50px; height: 50px; border: 3px solid var(--glass);
+            border-top: 3px solid var(--accent); border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- ОКНО ВВОДА НИКА --- */
+        /* --- МОДАЛКА НИКА --- */
         #name-modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            display: none; /* Включается через JS */
-            justify-content: center; align-items: center;
-            z-index: 9999;
-            backdrop-filter: blur(10px);
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); display: none; justify-content: center; 
+            align-items: center; z-index: 9999; backdrop-filter: blur(20px);
         }
         .modal-content {
-            background: var(--glass);
-            padding: 40px;
-            border-radius: 24px;
-            border: 1px solid var(--border);
-            text-align: center;
-            width: 90%; max-width: 400px;
+            background: var(--glass); padding: 50px; border-radius: 30px;
+            border: 1px solid var(--border); text-align: center; width: 90%; max-width: 450px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
         .modal-content input {
-            width: 100%; padding: 15px; margin: 20px 0;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border);
-            border-radius: 12px; color: #fff; text-align: center; font-size: 1.1rem;
+            width: 100%; padding: 15px; margin: 25px 0; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border); border-radius: 15px; color: #fff;
+            text-align: center; font-size: 1.2rem; outline: none; transition: 0.3s;
         }
+        .modal-content input:focus { border-color: var(--accent); }
         .modal-content button {
-            background: var(--accent); color: #000;
-            border: none; padding: 12px 30px; border-radius: 12px;
-            font-weight: bold; cursor: pointer; transition: 0.3s;
+            background: var(--accent); color: #000; border: none; padding: 15px 40px;
+            border-radius: 15px; font-weight: 800; cursor: pointer; transition: 0.3s;
         }
 
         /* --- ХЕДЕР --- */
         header {
-            padding: 20px 8%;
-            display: flex; justify-content: space-between; align-items: center;
-            backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 100;
-            border-bottom: 1px solid var(--border);
+            padding: 20px 8%; display: flex; justify-content: space-between; 
+            align-items: center; backdrop-filter: blur(15px); position: sticky; 
+            top: 0; z-index: 100; border-bottom: 1px solid var(--border);
         }
-        .logo { font-size: 1.4rem; font-weight: 900; }
-        .logo span { color: var(--accent); }
-
-        .nav-right { display: flex; align-items: center; gap: 20px; }
-        .user-profile { background: var(--glass); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--border); font-size: 0.9rem; }
+        .logo { font-size: 1.5rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        .logo span { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
         
-        .currency-selector select {
-            background: #fff; color: #000; border: none;
-            padding: 5px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .badge-user { background: var(--glass); padding: 6px 15px; border-radius: 20px; border: 1px solid var(--border); font-size: 0.85rem; }
+
+        .currency-select {
+            background: #fff; color: #000; border: none; padding: 6px 12px;
+            border-radius: 8px; font-weight: 700; cursor: pointer;
         }
 
-        /* --- ГЕРОЙ --- */
-        .hero { padding: 80px 5%; text-align: center; background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, transparent 60%); }
-        h1 { font-size: 4rem; margin-bottom: 15px; font-weight: 900; }
-        
-        .live-stats { display: flex; justify-content: center; gap: 40px; margin-top: 30px; }
-        .stat-item { background: var(--glass); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--border); }
-        .stat-item b { font-size: 1.5rem; display: block; color: var(--accent); }
-        .stat-item span { font-size: 0.75rem; color: #64748b; text-transform: uppercase; }
+        /* --- ВЫБОР ПЛАТФОРМЫ --- */
+        .platform-picker {
+            display: flex; justify-content: center; gap: 15px; margin: 40px 0;
+        }
+        .os-btn {
+            background: var(--glass); border: 1px solid var(--border); padding: 12px 25px;
+            border-radius: 15px; cursor: pointer; transition: 0.3s; display: flex;
+            align-items: center; gap: 10px; color: #94a3b8; font-weight: 600;
+        }
+        .os-btn.active { border-color: var(--accent); color: #fff; background: rgba(167, 139, 250, 0.1); }
+        .os-btn.disabled { opacity: 0.5; cursor: not-allowed; position: relative; }
+        .os-btn.disabled::after {
+            content: 'SOON'; position: absolute; top: -10px; right: -5px;
+            background: var(--accent-elite); color: #000; font-size: 0.6rem;
+            padding: 2px 6px; border-radius: 5px; font-weight: 900;
+        }
 
         /* --- КАРТОЧКИ --- */
-        .pricing { display: flex; justify-content: center; gap: 20px; padding: 50px 5%; flex-wrap: wrap; }
+        .pricing-wrap { display: flex; justify-content: center; gap: 25px; padding: 20px 5%; flex-wrap: wrap; }
         .card {
             background: var(--glass); border: 1px solid var(--border);
-            padding: 30px; border-radius: 24px; width: 320px;
-            cursor: pointer; transition: 0.3s; position: relative;
+            padding: 40px 30px; border-radius: 30px; width: 340px;
+            transition: 0.4s; cursor: pointer; position: relative; overflow: hidden;
         }
-        .card:hover { border-color: var(--accent); transform: translateY(-5px); background: rgba(255,255,255,0.05); }
-        .card.active { border-color: var(--accent); box-shadow: 0 0 20px rgba(167, 139, 250, 0.2); }
+        .card:hover { transform: translateY(-10px); border-color: var(--accent); }
+        .card.active { border-color: var(--accent); background: rgba(167, 139, 250, 0.05); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
+        
         .card.elite { border-color: var(--accent-elite); }
+        .card.elite:hover { box-shadow: 0 0 30px rgba(251, 191, 36, 0.1); }
 
-        .price { font-size: 2.5rem; font-weight: 800; margin: 15px 0; }
+        .card h3 { font-size: 1.6rem; margin-bottom: 10px; }
+        .price { font-size: 2.8rem; font-weight: 900; margin: 20px 0; }
+        .price span { font-size: 1rem; color: #64748b; }
+
         .btn {
-            display: block; width: 100%; padding: 12px; border-radius: 12px;
-            text-align: center; text-decoration: none; font-weight: 700; margin-top: 20px;
+            display: block; width: 100%; padding: 15px; border-radius: 12px;
+            text-align: center; text-decoration: none; font-weight: 800; margin-top: 25px;
+            transition: 0.3s; cursor: pointer; border: none;
         }
         .btn-free { background: var(--border); color: #fff; }
         .btn-pro { background: var(--accent); color: #000; }
         .btn-elite { background: var(--accent-elite); color: #000; }
 
-        /* --- ДИНАМИЧЕСКИЙ ТЕКСТ ПОД КАРТОЧКАМИ --- */
-        #detail-box {
-            max-width: 1000px; margin: 0 auto 50px;
-            background: var(--glass); border: 1px solid var(--border);
-            border-radius: 24px; padding: 40px;
-            display: none; /* Появляется при клике */
-            animation: slideUp 0.5s ease;
+        /* --- ПОДРОБНОСТИ --- */
+        #details {
+            max-width: 1000px; margin: 40px auto; background: var(--glass);
+            border: 1px solid var(--border); border-radius: 30px; padding: 50px;
+            display: none; animation: fadeIn 0.5s ease;
         }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        .tutor-step { margin-bottom: 15px; font-size: 0.95rem; color: #94a3b8; }
-        .tutor-step b { color: #fff; display: block; margin-bottom: 5px; }
+        .detail-flex { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .detail-flex ul { list-style: none; color: #94a3b8; }
+        .detail-flex li { margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+        .detail-flex li::before { content: '→'; color: var(--accent); }
 
-        /* --- ФУТЕР --- */
-        footer { padding: 60px 8%; text-align: center; border-top: 1px solid var(--border); margin-top: 50px; }
-        .admin-link {
-            display: inline-block; margin-top: 20px; color: #94a3b8; text-decoration: none;
-            font-size: 0.9rem; transition: 0.3s;
-        }
-        .admin-link:hover { color: var(--accent); }
+        /* --- СТАТИСТИКА --- */
+        .stats { display: flex; justify-content: center; gap: 50px; margin-top: 40px; }
+        .stat-card { text-align: center; }
+        .stat-card b { font-size: 2rem; color: var(--accent); display: block; }
+        .stat-card span { font-size: 0.8rem; color: #475569; text-transform: uppercase; font-weight: 700; }
 
-        @media (max-width: 768px) {
-            .detail-grid { grid-template-columns: 1fr; }
-            h1 { font-size: 2.5rem; }
-        }
+        footer { padding: 80px 5%; text-align: center; border-top: 1px solid var(--border); margin-top: 100px; }
+        .admin-btn { color: #64748b; text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+        .admin-btn:hover { color: var(--accent); }
+
+        @media (max-width: 850px) { .detail-flex { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-    <!-- Прелоадер -->
+    <div class="glow-bg"></div>
+
     <div id="loader">
         <div class="spinner"></div>
     </div>
 
-    <!-- Модалка ника -->
     <div id="name-modal">
         <div class="modal-content">
-            <h2>Добро пожаловать!</h2>
-            <p style="color: #64748b;">Как нам к вам обращаться?</p>
-            <input type="text" id="user-name-input" placeholder="Ваш никнейм..." maxlength="15">
-            <button onclick="saveName()">Войти на сайт</button>
+            <h2 style="font-size: 2rem;">Привет!</h2>
+            <p style="color: #94a3b8; margin-top: 10px;">Введи свой ник, чтобы персонализировать профиль</p>
+            <input type="text" id="username-input" placeholder="Твой никнейм..." maxlength="12">
+            <button onclick="confirmName()">Начать работу</button>
         </div>
     </div>
 
     <header>
         <div class="logo">NOVA<span>CAPTURE</span></div>
-        <div class="nav-right">
-            <div class="user-profile" id="user-display">Гость</div>
-            <div class="currency-selector">
-                <select id="currency" onchange="updatePrices()">
-                    <option value="UAH">UAH (₴)</option>
-                    <option value="USD">USD ($)</option>
-                    <option value="EUR">EUR (€)</option>
-                </select>
-            </div>
+        <div class="user-info">
+            <div class="badge-user" id="user-tag">Загрузка...</div>
+            <select class="currency-select" id="currency" onchange="syncUI()">
+                <option value="UAH">UAH</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+            </select>
         </div>
     </header>
 
-    <section class="hero">
-        <h1>Записывай <span>плавно</span>.</h1>
-        <p>Нажми на интересующую версию, чтобы узнать подробности и посмотреть туториал.</p>
-        
-        <div class="live-stats">
-            <div class="stat-item"><b id="stat-dl">14,200</b><span>Скачиваний</span></div>
-            <div class="stat-item"><b id="stat-online">452</b><span>Сейчас на сайте</span></div>
-        </div>
-    </section>
+    <main style="padding: 60px 5%; text-align: center;">
+        <h1 style="font-size: 4rem; letter-spacing: -2px;">Запись экрана без границ</h1>
+        <p style="color: #94a3b8; max-width: 600px; margin: 20px auto;">Выбери свою платформу и тариф. Мы оптимизировали NovaCapture под каждое устройство.</p>
 
-    <section class="pricing">
-        <!-- FREE -->
-        <div class="card" onclick="showDetails('FREE', this)">
-            <h3>Версия FREE</h3>
-            <div class="price">0 <span class="cur-text">UAH</span></div>
-            <p style="color: #64748b; font-size: 0.85rem;">Базовый захват для простых задач.</p>
-            <a href="#" class="btn btn-free">Скачать</a>
-        </div>
-
-        <!-- PRO -->
-        <div class="card" onclick="showDetails('PRO', this)">
-            <h3>Версия PRO</h3>
-            <div class="price"><span id="p-pro">50</span> <span class="cur-text">UAH</span></div>
-            <p style="color: #64748b; font-size: 0.85rem;">2K Запись и честные 60 FPS.</p>
-            <button onclick="buy('PRO')" class="btn btn-pro">Купить</button>
-        </div>
-
-        <!-- ELITE -->
-        <div class="card elite" onclick="showDetails('ELITE', this)">
-            <h3 style="color: var(--accent-elite);">Версия ELITE</h3>
-            <div class="price"><span id="p-elite">150</span> <span class="cur-text">UAH</span></div>
-            <p style="color: #64748b; font-size: 0.85rem;">120 FPS, AI-звук и скрытие окон.</p>
-            <button onclick="buy('ELITE')" class="btn btn-elite">Купить</button>
-        </div>
-    </section>
-
-    <!-- Динамический блок информации -->
-    <section id="detail-box">
-        <h2 id="detail-title" style="margin-bottom: 20px;">Заголовок</h2>
-        <div class="detail-grid">
-            <div>
-                <h4 style="color: var(--accent); margin-bottom: 15px;">Функции этой версии:</h4>
-                <ul id="detail-features" style="list-style: none; color: #cbd5e1; line-height: 2;">
-                    <!-- Сюда JS вставит данные -->
-                </ul>
+        <div class="platform-picker">
+            <div class="os-btn active" id="os-win" onclick="setOS('win')">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M6.555 1.375 0 2.237v5.45h6.555V1.375zM0 13.795l6.555.933V8.313H0v5.482zm7.246.068L16 15V8.313H7.246v5.55zm0-12.488V7.68H16V1.3l-8.754 1.073z"/></svg>
+                Windows
             </div>
-            <div>
-                <h4 style="color: var(--accent); margin-bottom: 15px;">Краткий туториал:</h4>
-                <div id="detail-tutor">
-                    <!-- Сюда JS вставит данные -->
+            <div class="os-btn" id="os-linux" onclick="setOS('linux')">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M9.552 12c.038 0 .073 0 .11-.001.037 0 .072.001.11.001a.75.75 0 0 0 .503-1.303l-1.145-1.041a.25.25 0 0 1-.03-.353l.421-.527a.75.75 0 0 0-.118-1.053L8.12 6.57a.25.25 0 0 1-.03-.353l.422-.528a.75.75 0 1 0-1.171-.937l-.422.528a.25.25 0 0 1-.354.03l-1.285-1.157a.75.75 0 0 0-1.053.118l-.421.527a.25.25 0 0 1-.353.03L2.308 4.364a.75.75 0 1 0-1.01 1.11l1.144 1.042a.25.25 0 0 1 .031.353l-.421.527a.75.75 0 0 0 .117 1.053l1.284 1.156a.25.25 0 0 1 .03.353l-.421.527a.75.75 0 0 0 1.171.938l.422-.528a.25.25 0 0 1 .353-.03l1.285 1.157a.75.75 0 0 0 1.053-.117l.421-.528a.25.25 0 0 1 .353-.03l1.285 1.157a.75.75 0 0 0 .502.201Z"/><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm0 14.5a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13Z"/></svg>
+                Linux
+            </div>
+            <div class="os-btn disabled">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516.024.034 1.52.087 2.475-1.258.955-1.345.762-2.391.728-2.43Zm3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422.212-2.189 1.675-2.913 2.096-3.136.041-.022.011-.12-.062-.136-.171-.037-1.122-.167-2.028.29-1.384.703-1.447 1.767-2.366 1.767-.92 0-.812-1.063-2.203-1.724-.985-.469-2.026-.301-2.203-.271-.074.012-.107.109-.066.145.375.329 1.961 1.725 2.041 4.054.08 2.33-1.485 3.758-1.997 4.187-.099.083-.02.236.081.236 1.19-.011 2.39-.502 3.062-1.289.672-.787 1.133-1.276 2.015-1.276.883 0 1.284.44 2.042 1.302.459.524 1.619 1.409 3.051 1.235.1-.012.146-.164.066-.257l-.39-.451Z"/></svg>
+                macOS
+            </div>
+        </div>
+
+        <div class="pricing-wrap">
+            <!-- FREE -->
+            <div class="card" onclick="openDetails('FREE', this)">
+                <h3>Версия FREE</h3>
+                <div class="price">0 <span class="cur-label">UAH</span></div>
+                <p style="color: #64748b; font-size: 0.9rem;">Для тех, кому нужно просто и быстро.</p>
+                <button class="btn btn-free">Скачать</button>
+            </div>
+
+            <!-- PRO -->
+            <div class="card active" onclick="openDetails('PRO', this)">
+                <h3>Версия PRO</h3>
+                <div class="price"><span id="p-pro">50</span> <span class="cur-label">UAH</span></div>
+                <p style="color: #64748b; font-size: 0.9rem;">Идеальный баланс для гейминга.</p>
+                <button onclick="buy('PRO')" class="btn btn-pro">Купить PRO</button>
+            </div>
+
+            <!-- ELITE -->
+            <div class="card elite" onclick="openDetails('ELITE', this)">
+                <h3 style="color: var(--accent-elite);">Версия ELITE</h3>
+                <div class="price"><span id="p-elite">150</span> <span class="cur-label">UAH</span></div>
+                <p style="color: #64748b; font-size: 0.9rem;">Ультимативный набор инструментов.</p>
+                <button onclick="buy('ELITE')" class="btn btn-elite">Купить ELITE</button>
+            </div>
+        </div>
+
+        <div id="details">
+            <h2 id="det-title" style="margin-bottom: 30px; font-size: 2rem;"></h2>
+            <div class="detail-flex">
+                <div>
+                    <h4 style="margin-bottom: 15px; color: #fff;">Что внутри:</h4>
+                    <ul id="det-list"></ul>
+                </div>
+                <div style="background: rgba(255,255,255,0.02); padding: 30px; border-radius: 20px;">
+                    <h4 style="margin-bottom: 15px; color: var(--accent);">Гайд по установке:</h4>
+                    <p id="det-guide" style="font-size: 0.9rem; color: #94a3b8; line-height: 1.8;"></p>
                 </div>
             </div>
         </div>
-    </section>
+
+        <div class="stats">
+            <div class="stat-card"><b id="s-dl">18,502</b><span>Загрузок</span></div>
+            <div class="stat-card"><b id="s-on">512</b><span>Посетителей</span></div>
+        </div>
+    </main>
 
     <footer>
-        <p>&copy; 2026 NovaCapture. Все права защищены.</p>
-        <a href="https://t.me/Otmena5253?text=Здравствуйте, у меня возник вопрос по поводу работы сайта/приложения." class="admin-link">
-            Связаться с администрацией
-        </a>
+        <p style="color: #475569; margin-bottom: 10px;">NovaCapture &copy; 2026. Сделано с душой для flamefragments.</p>
+        <a href="https://t.me/Otmena5253?text=Привет, нужна помощь с сайтом!" class="admin-btn">Связаться с техподдержкой</a>
     </footer>
 
     <script>
-        // Данные для динамического блока
-        const info = {
-            'FREE': {
-                title: 'NovaCapture FREE — Просто и быстро',
-                features: ['• Запись в 1080p', '• Системный звук', '• Формат MP4', '• Ограничение 30 FPS'],
-                tutor: [
-                    '<b>1. Установка:</b> Скачайте и запустите установщик.',
-                    '<b>2. Запуск:</b> Нажмите кнопку "Record" в главном меню.',
-                    '<b>3. Сохранение:</b> Видео появится в папке "Videos/NovaCapture".'
-                ]
-            },
-            'PRO': {
-                title: 'NovaCapture PRO — Качество для геймеров',
-                features: ['• Запись 2K HD (1440p)', '• Стабильные 60 FPS', '• Без водяных знаков', '• Горячие клавиши'],
-                tutor: [
-                    '<b>1. Настройка:</b> Зайдите в "Settings" и выберите кодек GPU.',
-                    '<b>2. Бинды:</b> Настройте клавишу начала записи (по дефолту F9).',
-                    '<b>3. Оверлей:</b> Включите отображение FPS в углу экрана.'
-                ]
-            },
-            'ELITE': {
-                title: 'NovaCapture ELITE — Максимальный контроль',
-                features: ['• 2K @ 120 FPS', '• AI-Шумоподавление микрофона', '• Скрытие окон Discord/TG', '• Мгновенный повтор'],
-                tutor: [
-                    '<b>1. Stealth:</b> Включите режим невидимости для античитов.',
-                    '<b>2. AI Audio:</b> В настройках звука выберите "AI Noise Suppression".',
-                    '<b>3. ShadowPlay:</b> Нажмите Alt+F10, чтобы сохранить последние 5 минут игры.'
-                ]
-            }
+        let currentOS = 'win';
+        const osData = {
+            win: { multiplier: 1, guide: "Скачайте .exe файл, запустите установку и следуйте инструкциям мастера. Программа автоматически добавится в автозагрузку." },
+            linux: { multiplier: 1.4, guide: "Мы предоставляем сборки под .deb, .rpm и универсальный AppImage. После покупки вы получите скрипт автоматической настройки под ваш дистрибутив (Arch, Ubuntu, Fedora)." }
         };
 
-        // Логика загрузки и ника
+        const tierInfo = {
+            'FREE': { title: "NovaCapture Free Edition", items: ["Запись 1080p", "Системный звук", "Формат MP4/MKV", "Лимит 30 кадров"] },
+            'PRO': { title: "NovaCapture Pro Edition", items: ["Запись 2K @ 60 FPS", "Без водяных знаков", "Аппаратное ускорение", "Игровой оверлей"] },
+            'ELITE': { title: "NovaCapture Elite Edition", items: ["2K @ 120 FPS", "AI-Шумоподавление", "Скрытие окон (Discord/TG)", "Мгновенный повтор (5 мин)"] }
+        };
+
         window.onload = () => {
             setTimeout(() => {
                 document.getElementById('loader').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('loader').style.display = 'none';
-                    const savedName = localStorage.getItem('userName');
-                    if (savedName) {
-                        document.getElementById('user-display').innerText = savedName;
-                    } else {
-                        document.getElementById('name-modal').style.display = 'flex';
-                    }
+                    const name = localStorage.getItem('novaName');
+                    if (!name) document.getElementById('name-modal').style.display = 'flex';
+                    else document.getElementById('user-tag').innerText = `Профиль: ${name}`;
                 }, 500);
-            }, 1000);
+            }, 1200);
+            animateStats();
         };
 
-        function saveName() {
-            const val = document.getElementById('user-name-input').value || "Пользователь";
-            localStorage.setItem('userName', val);
-            document.getElementById('user-display').innerText = val;
+        function confirmName() {
+            const input = document.getElementById('username-input').value || 'User';
+            localStorage.setItem('novaName', input);
+            document.getElementById('user-tag').innerText = `Профиль: ${input}`;
             document.getElementById('name-modal').style.display = 'none';
         }
 
-        // Показ деталей при клике на карточку
-        function showDetails(tier, el) {
-            // Убираем активный класс у всех
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-
-            const box = document.getElementById('detail-box');
-            const data = info[tier];
-
-            document.getElementById('detail-title').innerText = data.title;
-            
-            // Список функций
-            const featList = document.getElementById('detail-features');
-            featList.innerHTML = data.features.map(f => `<li>${f}</li>`).join('');
-
-            // Туториал
-            const tutorDiv = document.getElementById('detail-tutor');
-            tutorDiv.innerHTML = data.tutor.map(t => `<div class="tutor-step">${t}</div>`).join('');
-
-            box.style.display = 'block';
-            box.scrollIntoView({ behavior: 'smooth' });
+        function setOS(os) {
+            currentOS = os;
+            document.querySelectorAll('.os-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`os-${os}`).classList.add('active');
+            syncUI();
         }
 
-        // Счетчики
-        function animateStats() {
-            setInterval(() => {
-                const dl = document.getElementById('stat-dl');
-                const online = document.getElementById('stat-online');
-                
-                if(Math.random() > 0.7) {
-                    dl.innerText = (parseInt(dl.innerText.replace(',','')) + 1).toLocaleString();
-                }
-                online.innerText = Math.floor(Math.random() * (500 - 400) + 400);
-            }, 3000);
-        }
-        animateStats();
-
-        // Валюты
-        function updatePrices() {
+        function syncUI() {
             const cur = document.getElementById('currency').value;
+            const labels = document.querySelectorAll('.cur-label');
             const pPro = document.getElementById('p-pro');
             const pElite = document.getElementById('p-elite');
-            const labels = document.querySelectorAll('.cur-text');
 
-            let vPro = 50, vElite = 150;
-            if (cur === 'USD') { vPro = 1.3; vElite = 3.9; }
-            if (cur === 'EUR') { vPro = 1.2; vElite = 3.7; }
+            let basePro = 50, baseElite = 150;
+            if (cur === 'USD') { basePro = 1.3; baseElite = 3.9; }
+            if (cur === 'EUR') { basePro = 1.2; baseElite = 3.7; }
 
-            pPro.innerText = vPro;
-            pElite.innerText = vElite;
+            // Применяем наценку для Linux
+            const mult = osData[currentOS].multiplier;
+            pPro.innerText = (basePro * mult).toFixed(cur === 'UAH' ? 0 : 1);
+            pElite.innerText = (baseElite * mult).toFixed(cur === 'UAH' ? 0 : 1);
             labels.forEach(l => l.innerText = cur);
         }
 
+        function openDetails(tier, el) {
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+
+            const box = document.getElementById('details');
+            const data = tierInfo[tier];
+
+            document.getElementById('det-title').innerText = data.title;
+            document.getElementById('det-list').innerHTML = data.items.map(i => `<li>${i}</li>`).join('');
+            document.getElementById('det-guide').innerText = osData[currentOS].guide;
+
+            box.style.display = 'block';
+            box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
         function buy(tier) {
-            const name = localStorage.getItem('userName') || "Гость";
+            const name = localStorage.getItem('novaName') || 'Гость';
             const cur = document.getElementById('currency').value;
             const price = (tier === 'PRO') ? document.getElementById('p-pro').innerText : document.getElementById('p-elite').innerText;
-            const text = encodeURIComponent(`Здравствуйте, меня зовут ${name}. Хочу купить версию ${tier} за ${price} ${cur} на вашем сайте.`);
+            const text = encodeURIComponent(`Привет! Я ${name}. Хочу купить ${tier} версию для ${currentOS.toUpperCase()} за ${price} ${cur}.`);
             window.open(`https://t.me/Otmena5253?text=${text}`, '_blank');
+        }
+
+        function animateStats() {
+            setInterval(() => {
+                if(Math.random() > 0.7) {
+                    const s = document.getElementById('s-dl');
+                    s.innerText = (parseInt(s.innerText.replace(',', '')) + 1).toLocaleString();
+                }
+                document.getElementById('s-on').innerText = Math.floor(Math.random() * (600 - 450) + 450);
+            }, 3000);
         }
     </script>
 </body>
