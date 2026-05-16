@@ -1,146 +1,81 @@
-const API_URL = "https://vortex-dtd5.onrender.com"; // Твой рабочий сервер!
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 
-let currentUser = null; 
-let isLoginMode = true; 
+app = Flask(__name__)
+# Разрешаем запросы с любого домена
+CORS(app, resources={r"/api/*": {"origins": "*"}}) 
 
-function switchTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.nav-links li').forEach(link => link.classList.remove('active'));
-    
-    document.getElementById(tabId).classList.add('active');
-    event.target.classList.add('active');
-}
-
-function changeTheme() {
-    const theme = document.getElementById('theme-selector').value;
-    document.documentElement.setAttribute('data-theme', theme);
-}
-
-// --- МОДАЛЬНЫЕ ОКНА И АВТОРИЗАЦИЯ ---
-function openModal(id) { document.getElementById(id).style.display = 'block'; }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-function toggleAuthMode() {
-    isLoginMode = !isLoginMode;
-    document.getElementById('modal-title').innerText = isLoginMode ? 'Вход' : 'Регистрация';
-    document.getElementById('auth-password-repeat').style.display = isLoginMode ? 'none' : 'block';
-    document.querySelector('.toggle-auth').innerText = isLoginMode ? 'Нет аккаунта? Зарегистрироваться' : 'Есть аккаунт? Войти';
-}
-
-async function submitAuth() {
-    const username = document.getElementById('auth-username').value;
-    const pass = document.getElementById('auth-password').value;
-    
-    if(!username || !pass) {
-        alert("Заполните все поля!");
-        return;
+# Наша База данных. Твой аккаунт уже тут с правами админа!
+users = {
+    "maloshko": {
+        "password": "maksjmka2607", 
+        "friends": [], 
+        "balance": 0, 
+        "sub": True, 
+        "role": "admin"
     }
+}
 
-    const endpoint = isLoginMode ? '/api/login' : '/api/register';
+tracks = [
+    {"id": 1, "title": "Night City", "artist": "CyberM", "url": "audio/1.mp3"},
+    {"id": 2, "title": "Chill Vibes", "artist": "LoFi Guy", "url": "audio/2.mp3"}
+]
 
-    try {
-        const response = await fetch(`${API_URL}${endpoint}`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({username: username, password: pass})
-        });
-        const data = await response.json();
+@app.route('/api/recommendations', methods=['GET'])
+def get_recommendations():
+    return jsonify({"status": "success", "data": tracks})
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    
+    if username in users:
+        return jsonify({"status": "error", "message": "Пользователь уже существует"}), 400
         
-        if (data.status === 'success') {
-            if (!isLoginMode) {
-                // Если это была регистрация, сразу автоматически логиним пользователя!
-                const loginRes = await fetch(`${API_URL}/api/login`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({username: username, password: pass})
-                });
-                const loginData = await loginRes.json();
-                if(loginData.status === 'success') {
-                    completeLogin(loginData.user);
-                }
-            } else {
-                // Если это был обычный вход
-                completeLogin(data.user);
-            }
-        } else {
-            alert("Ошибка: " + data.message);
-        }
-    } catch (e) { 
-        alert("Сервер недоступен! Подождите 10 секунд и попробуйте снова (сервер просыпается)."); 
-    }
-}
+    users[username] = {"password": password, "friends": [], "balance": 0, "sub": False, "role": "user"}
+    return jsonify({"status": "success", "message": "Регистрация успешна!"})
 
-// Функция успешного входа (меняем кнопки)
-function completeLogin(user) {
-    currentUser = user;
-    closeModal('auth-modal');
+@app.route('/api/login', methods=['POST'])
+def login():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
     
-    // Прячем кнопку "Войти", показываем Имя и кнопку "Выйти"
-    document.getElementById('auth-section').innerHTML = `
-        <span style="margin-right:15px;">Привет, <b>${currentUser.username}</b></span>
-        <button class="glass-btn" onclick="logout()">Выйти</button>
-    `;
+    user = users.get(username)
+    if user and user['password'] == password:
+        user_data = {"username": username, "sub": user['sub'], "role": user['role'], "balance": user['balance']}
+        return jsonify({"status": "success", "user": user_data})
+    return jsonify({"status": "error", "message": "Неверный логин или пароль"}), 401
+
+# --- АДМИН ПАНЕЛЬ ---
+@app.route('/api/admin/users', methods=['POST'])
+def get_all_users():
+    data = request.json
+    req_user = data.get('admin_username')
     
-    // Показываем админ-панель, если это админ
-    if (currentUser.role === 'admin') {
-        document.getElementById('nav-admin').style.display = 'block';
-    }
-}
+    if users.get(req_user, {}).get('role') == 'admin':
+        safe_users = {k: {"role": v["role"], "sub": v["sub"]} for k, v in users.items()}
+        return jsonify({"status": "success", "users": safe_users})
+    return jsonify({"status": "error", "message": "Нет прав"}), 403
 
-// Функция выхода из аккаунта
-function logout() {
-    currentUser = null;
-    document.getElementById('auth-section').innerHTML = `<button class="glass-btn" onclick="openModal('auth-modal')">Войти</button>`;
-    document.getElementById('nav-admin').style.display = 'none';
-    switchTab('recommendations'); // перекидываем на главную
-}
+@app.route('/api/admin/action', methods=['POST'])
+def admin_action():
+    data = request.json
+    req_user = data.get('admin_username')
+    target_user = data.get('target_user')
+    action = data.get('action') 
 
-// --- АДМИН ПАНЕЛЬ ---
-async function loadAdminUsers() {
-    if (!currentUser || currentUser.role !== 'admin') return;
+    if users.get(req_user, {}).get('role') != 'admin':
+        return jsonify({"status": "error", "message": "Нет прав"}), 403
 
-    const res = await fetch(`${API_URL}/api/admin/users`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({admin_username: currentUser.username})
-    });
-    const data = await res.json();
-    
-    if (data.status === 'success') {
-        const container = document.getElementById('admin-users-list');
-        container.innerHTML = '';
-        for (let user in data.users) {
-            let u = data.users[user];
-            container.innerHTML += `
-                <div class="admin-user-card">
-                    <div>
-                        <b>${user}</b><br>
-                        <small>Роль: ${u.role} | Подписка: ${u.sub ? 'Есть ✅' : 'Нет ❌'}</small>
-                    </div>
-                    <div class="admin-actions">
-                        ${!u.sub ? `<button class="glass-btn" onclick="adminAction('${user}', 'give_sub')">+ Подписка</button>` : ''}
-                        ${u.role !== 'admin' ? `<button class="glass-btn accent" onclick="adminAction('${user}', 'give_admin')">+ Админ</button>` : ''}
-                    </div>
-                </div>
-            `;
-        }
-    }
-}
+    if action == 'give_sub':
+        users[target_user]['sub'] = True
+    elif action == 'give_admin':
+        users[target_user]['role'] = 'admin'
 
-async function adminAction(targetUser, action) {
-    await fetch(`${API_URL}/api/admin/action`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            admin_username: currentUser.username,
-            target_user: targetUser,
-            action: action
-        })
-    });
-    loadAdminUsers(); // Обновляем список после нажатия
-}
+    return jsonify({"status": "success", "message": f"Действие {action} для {target_user} выполнено!"})
 
-// Лайк (сердечко)
-document.querySelector('.heart-btn').addEventListener('click', function() {
-    this.classList.toggle('active');
-});
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=10000)
