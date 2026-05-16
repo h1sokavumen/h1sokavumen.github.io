@@ -1,7 +1,7 @@
-const API_URL = "https://vortex-dtd5.onrender.com"; // Пока тестируем локально. Потом поменяем на Render.
+const API_URL = "https://vortex-dtd5.onrender.com"; // Твой рабочий сервер!
 
-let currentUser = null; // Храним данные вошедшего пользователя
-let isLoginMode = true; // Переключатель логин/регистрация
+let currentUser = null; 
+let isLoginMode = true; 
 
 function switchTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -30,6 +30,12 @@ function toggleAuthMode() {
 async function submitAuth() {
     const username = document.getElementById('auth-username').value;
     const pass = document.getElementById('auth-password').value;
+    
+    if(!username || !pass) {
+        alert("Заполните все поля!");
+        return;
+    }
+
     const endpoint = isLoginMode ? '/api/login' : '/api/register';
 
     try {
@@ -41,20 +47,52 @@ async function submitAuth() {
         const data = await response.json();
         
         if (data.status === 'success') {
-            alert(data.message || "Успешный вход!");
-            closeModal('auth-modal');
-            if (isLoginMode) {
-                currentUser = data.user;
-                document.getElementById('auth-section').innerHTML = `<span style="margin-right:15px;">Привет, ${currentUser.username}</span>`;
-                // Если ты админ, показываем вкладку!
-                if (currentUser.role === 'admin') {
-                    document.getElementById('nav-admin').style.display = 'block';
+            if (!isLoginMode) {
+                // Если это была регистрация, сразу автоматически логиним пользователя!
+                const loginRes = await fetch(`${API_URL}/api/login`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username: username, password: pass})
+                });
+                const loginData = await loginRes.json();
+                if(loginData.status === 'success') {
+                    completeLogin(loginData.user);
                 }
+            } else {
+                // Если это был обычный вход
+                completeLogin(data.user);
             }
         } else {
             alert("Ошибка: " + data.message);
         }
-    } catch (e) { alert("Сервер недоступен!"); }
+    } catch (e) { 
+        alert("Сервер недоступен! Подождите 10 секунд и попробуйте снова (сервер просыпается)."); 
+    }
+}
+
+// Функция успешного входа (меняем кнопки)
+function completeLogin(user) {
+    currentUser = user;
+    closeModal('auth-modal');
+    
+    // Прячем кнопку "Войти", показываем Имя и кнопку "Выйти"
+    document.getElementById('auth-section').innerHTML = `
+        <span style="margin-right:15px;">Привет, <b>${currentUser.username}</b></span>
+        <button class="glass-btn" onclick="logout()">Выйти</button>
+    `;
+    
+    // Показываем админ-панель, если это админ
+    if (currentUser.role === 'admin') {
+        document.getElementById('nav-admin').style.display = 'block';
+    }
+}
+
+// Функция выхода из аккаунта
+function logout() {
+    currentUser = null;
+    document.getElementById('auth-section').innerHTML = `<button class="glass-btn" onclick="openModal('auth-modal')">Войти</button>`;
+    document.getElementById('nav-admin').style.display = 'none';
+    switchTab('recommendations'); // перекидываем на главную
 }
 
 // --- АДМИН ПАНЕЛЬ ---
@@ -77,7 +115,7 @@ async function loadAdminUsers() {
                 <div class="admin-user-card">
                     <div>
                         <b>${user}</b><br>
-                        <small>Роль: ${u.role} | Подписка: ${u.sub ? 'Есть' : 'Нет'}</small>
+                        <small>Роль: ${u.role} | Подписка: ${u.sub ? 'Есть ✅' : 'Нет ❌'}</small>
                     </div>
                     <div class="admin-actions">
                         ${!u.sub ? `<button class="glass-btn" onclick="adminAction('${user}', 'give_sub')">+ Подписка</button>` : ''}
@@ -99,10 +137,10 @@ async function adminAction(targetUser, action) {
             action: action
         })
     });
-    loadAdminUsers(); // Обновляем список
+    loadAdminUsers(); // Обновляем список после нажатия
 }
 
-// Лайк
+// Лайк (сердечко)
 document.querySelector('.heart-btn').addEventListener('click', function() {
     this.classList.toggle('active');
 });
