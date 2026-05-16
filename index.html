@@ -7,100 +7,94 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <video autoplay loop muted id="bg-video">
-        <source src="background.mp4" type="video/mp4">
-    </video>
+    <video autoplay loop muted id="bg-video"><source src="background.mp4" type="video/mp4"></video>
 
     <nav class="glass-menu">
-        <div class="logo">
-            <svg width="30" height="30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M10 90 L50 10 L90 90 Z" fill="var(--text-color)" stroke="var(--text-color)" stroke-width="5"/>
-                <circle cx="50" cy="65" r="10" fill="var(--bg-overlay)"/>
-            </svg>
-            <span>Nova Sounds</span>
-        </div>
+        <div class="logo"><span>Nova Sounds</span></div>
         <ul class="nav-links">
             <li class="active" onclick="switchTab('recommendations')">Рекомендации</li>
-            <li onclick="switchTab('favorites')">Любимое</li>
             <li onclick="switchTab('friends')">Друзья</li>
             <li onclick="switchTab('profile')">Профиль</li>
             <li onclick="switchTab('settings')">Настройки</li>
-            <!-- Скрытая вкладка админа -->
             <li id="nav-admin" style="display: none;" onclick="switchTab('admin'); loadAdminUsers();">Админ</li>
         </ul>
-        <div class="auth-buttons" id="auth-section">
-            <button class="glass-btn" onclick="openModal('auth-modal')">Войти</button>
-        </div>
+        <div id="auth-section"><button class="glass-btn" onclick="openModal('auth-modal')">Войти</button></div>
     </nav>
 
     <main id="content">
         <div id="recommendations" class="tab-content active">
             <h2>Рекомендации</h2>
-            <p>Слушай лучшие треки площадки.</p>
-            <div id="tracks-container"></div>
+            <div id="tracks-container" class="music-grid"></div>
         </div>
         
-        <div id="friends" class="tab-content">
-            <h2>Друзья</h2>
-            <input type="text" class="glass-input" placeholder="Поиск по никнейму...">
-            <div class="center-message">У вас пока нет друзей</div>
+        <div id="profile" class="tab-content">
+            <div class="profile-card glass-panel">
+                <div id="profile-banner" class="banner"></div>
+                <div class="p-info">
+                    <img id="profile-avatar" src="" class="avatar">
+                    <h2 id="profile-name">Имя</h2>
+                    <p id="profile-bio">Описание...</p>
+                    <button class="glass-btn" onclick="openModal('edit-profile-modal')">Изменить профиль</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin" class="tab-content">
+            <h2>Админ Панель</h2>
+            <div class="admin-grid">
+                <div class="glass-panel p-20">
+                    <h3>Добавить трек</h3>
+                    <input type="text" id="track-title" class="glass-input" placeholder="Название">
+                    <input type="text" id="track-artist" class="glass-input" placeholder="Автор">
+                    <input type="text" id="track-url" class="glass-input" placeholder="URL mp3">
+                    <button class="glass-btn accent" onclick="uploadTrack()">Загрузить</button>
+                </div>
+                <div class="glass-panel p-20">
+                    <h3>Пользователи</h3>
+                    <div id="admin-users-list"></div>
+                </div>
+            </div>
         </div>
 
         <div id="settings" class="tab-content">
             <h2>Настройки</h2>
-            <div class="setting-item">
-                <label>Тема оформления:</label>
-                <select id="theme-selector" class="glass-input" onchange="changeTheme()">
-                    <option value="dark-classic">Черная классика + белый</option>
-                    <option value="purple-dark">Фиолетовый градиент + черный</option>
-                    <option value="white-classic">Белая классика + черный</option>
-                    <option value="green-dark">Зеленый градиент + черный</option>
-                    <option value="blue-white">Голубой + белый</option>
-                </select>
-            </div>
-            <div class="setting-item">
-                <button class="glass-btn accent">Купить подписку (30 грн)</button>
-            </div>
-        </div>
-
-        <!-- АДМИН ПАНЕЛЬ -->
-        <div id="admin" class="tab-content">
-            <h2>Панель Администратора</h2>
-            <p>Управление пользователями Nova Sounds.</p>
-            <div id="admin-users-list"></div>
+            <select id="theme-selector" class="glass-input" onchange="changeTheme()">
+                <option value="dark-classic">Черная классика</option>
+                <option value="purple-dark">Фиолетовая ночь</option>
+                <option value="white-classic">Светлая тема</option>
+            </select>
         </div>
     </main>
 
-    <!-- Плеер снизу -->
     <div class="music-player">
-        <div class="track-info">
-            <div class="track-art"></div>
-            <div>
-                <h4 id="player-title">Ничего не играет</h4>
-                <p id="player-artist">-</p>
-            </div>
-            <svg class="heart-btn" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <div class="player-info">
+            <b id="p-title">Nova Sounds</b><br><small id="p-artist">Выбери трек</small>
         </div>
         <div class="controls">
-            <button class="icon-btn">⏮</button>
-            <button class="icon-btn" id="play-pause">▶</button>
-            <button class="icon-btn">⏭</button>
+            <button class="icon-btn" onclick="togglePlay()">▶</button>
         </div>
-        <div class="progress-bar">
-            <div class="progress"></div>
-        </div>
+        <audio id="main-audio"></audio>
     </div>
 
-    <!-- Модальное окно Входа/Регистрации -->
+    <!-- Модалки -->
     <div id="auth-modal" class="modal">
         <div class="modal-content glass-panel">
-            <span class="close-btn" onclick="closeModal('auth-modal')">&times;</span>
             <h2 id="modal-title">Вход</h2>
             <input type="text" id="auth-username" class="glass-input" placeholder="Никнейм">
             <input type="password" id="auth-password" class="glass-input" placeholder="Пароль">
-            <input type="password" id="auth-password-repeat" class="glass-input" placeholder="Повторите пароль" style="display: none;">
-            <button class="glass-btn accent" onclick="submitAuth()">Подтвердить</button>
-            <p class="toggle-auth" onclick="toggleAuthMode()">Нет аккаунта? Зарегистрироваться</p>
+            <button class="glass-btn accent w-100" onclick="submitAuth()">Подтвердить</button>
+            <p class="toggle-auth" onclick="toggleAuthMode()">Нет аккаунта? Регистрация</p>
+        </div>
+    </div>
+
+    <div id="edit-profile-modal" class="modal">
+        <div class="modal-content glass-panel">
+            <h2>Настройки профиля</h2>
+            <input type="text" id="edit-avatar" class="glass-input" placeholder="Ссылка на аватар">
+            <input type="text" id="edit-banner" class="glass-input" placeholder="Ссылка на баннер">
+            <textarea id="edit-bio" class="glass-input" placeholder="О себе"></textarea>
+            <button class="glass-btn accent w-100" onclick="saveProfile()">Сохранить</button>
+            <button class="glass-btn w-100 mt-10" onclick="closeModal('edit-profile-modal')">Отмена</button>
         </div>
     </div>
 
