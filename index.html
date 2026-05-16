@@ -14,11 +14,11 @@
         <ul class="nav-links">
             <li class="active" onclick="switchTab('recommendations')">Рекомендации</li>
             <li onclick="switchTab('friends')">Друзья</li>
-            <li onclick="switchTab('profile')">Профиль</li>
+            <li onclick="switchTab('profile')">Мой Профиль</li>
             <li onclick="switchTab('settings')">Настройки</li>
-            <li id="nav-admin" style="display: none;" onclick="switchTab('admin'); loadAdminUsers();">Админ</li>
+            <li id="nav-admin" style="display: none;" onclick="switchTab('admin')">Админ</li>
         </ul>
-        <div id="auth-section"><button class="glass-btn" onclick="openModal('auth-modal')">Войти</button></div>
+        <div id="auth-section"></div>
     </nav>
 
     <main id="content">
@@ -27,75 +27,75 @@
             <div id="tracks-container" class="music-grid"></div>
         </div>
         
-        <div id="profile" class="tab-content">
-            <div class="profile-card glass-panel">
-                <div id="profile-banner" class="banner"></div>
-                <div class="p-info">
-                    <img id="profile-avatar" src="" class="avatar">
-                    <h2 id="profile-name">Имя</h2>
-                    <p id="profile-bio">Описание...</p>
-                    <button class="glass-btn" onclick="openModal('edit-profile-modal')">Изменить профиль</button>
-                </div>
+        <div id="friends" class="tab-content">
+            <h2>Найти людей</h2>
+            <div class="search-box">
+                <input type="text" id="user-search-input" class="glass-input" placeholder="Введите никнейм...">
+                <button class="glass-btn accent" onclick="searchUser()">Поиск</button>
             </div>
+            <div id="search-result" style="margin-top: 20px;"></div>
+        </div>
+
+        <div id="profile" class="tab-content">
+            <div id="self-profile-view"></div> <!-- Сюда рендерится профиль -->
         </div>
 
         <div id="admin" class="tab-content">
             <h2>Админ Панель</h2>
             <div class="admin-grid">
                 <div class="glass-panel p-20">
-                    <h3>Добавить трек</h3>
+                    <h3>Загрузить трек</h3>
                     <input type="text" id="track-title" class="glass-input" placeholder="Название">
                     <input type="text" id="track-artist" class="glass-input" placeholder="Автор">
-                    <input type="text" id="track-url" class="glass-input" placeholder="URL mp3">
-                    <button class="glass-btn accent" onclick="uploadTrack()">Загрузить</button>
-                </div>
-                <div class="glass-panel p-20">
-                    <h3>Пользователи</h3>
-                    <div id="admin-users-list"></div>
+                    <p style="font-size: 12px; margin-bottom: 5px;">Выбрать файл с ПК:</p>
+                    <input type="file" id="track-file" class="glass-input" accept="audio/mp3">
+                    <p style="text-align: center; opacity: 0.5;">ИЛИ ссылка</p>
+                    <input type="text" id="track-url" class="glass-input" placeholder="URL .mp3">
+                    <button class="glass-btn accent w-100" onclick="uploadTrack()">Опубликовать</button>
                 </div>
             </div>
         </div>
-
-        <div id="settings" class="tab-content">
-            <h2>Настройки</h2>
-            <select id="theme-selector" class="glass-input" onchange="changeTheme()">
-                <option value="dark-classic">Черная классика</option>
-                <option value="purple-dark">Фиолетовая ночь</option>
-                <option value="white-classic">Светлая тема</option>
-            </select>
-        </div>
     </main>
 
-    <div class="music-player">
-        <div class="player-info">
-            <b id="p-title">Nova Sounds</b><br><small id="p-artist">Выбери трек</small>
+    <!-- Модалка просмотра чужого профиля -->
+    <div id="view-user-modal" class="modal">
+        <div class="modal-content glass-panel" style="width: 90%; max-width: 600px; padding: 0; overflow: hidden;">
+            <div id="v-user-banner" class="banner" style="height: 120px;"></div>
+            <div style="padding: 20px; text-align: center; margin-top: -50px;">
+                <img id="v-user-avatar" src="" class="avatar" style="width: 100px; height: 100px;">
+                <h2 id="v-user-name"></h2>
+                <p id="v-user-bio"></p>
+                <button class="glass-btn mt-10" onclick="closeModal('view-user-modal')">Закрыть</button>
+            </div>
         </div>
-        <div class="controls">
-            <button class="icon-btn" onclick="togglePlay()">▶</button>
-        </div>
-        <audio id="main-audio"></audio>
     </div>
 
-    <!-- Модалки -->
+    <!-- Модалка регистрации/входа -->
     <div id="auth-modal" class="modal">
         <div class="modal-content glass-panel">
             <h2 id="modal-title">Вход</h2>
             <input type="text" id="auth-username" class="glass-input" placeholder="Никнейм">
             <input type="password" id="auth-password" class="glass-input" placeholder="Пароль">
             <button class="glass-btn accent w-100" onclick="submitAuth()">Подтвердить</button>
-            <p class="toggle-auth" onclick="toggleAuthMode()">Нет аккаунта? Регистрация</p>
+            <p class="toggle-auth" onclick="toggleAuthMode()">Регистрация</p>
         </div>
     </div>
 
+    <!-- Модалка настроек профиля -->
     <div id="edit-profile-modal" class="modal">
         <div class="modal-content glass-panel">
             <h2>Настройки профиля</h2>
-            <input type="text" id="edit-avatar" class="glass-input" placeholder="Ссылка на аватар">
-            <input type="text" id="edit-banner" class="glass-input" placeholder="Ссылка на баннер">
-            <textarea id="edit-bio" class="glass-input" placeholder="О себе"></textarea>
+            <input type="text" id="edit-avatar" class="glass-input" placeholder="URL аватарки">
+            <input type="text" id="edit-banner" class="glass-input" placeholder="URL баннера">
+            <textarea id="edit-bio" class="glass-input" placeholder="О себе..."></textarea>
             <button class="glass-btn accent w-100" onclick="saveProfile()">Сохранить</button>
             <button class="glass-btn w-100 mt-10" onclick="closeModal('edit-profile-modal')">Отмена</button>
         </div>
+    </div>
+
+    <div class="music-player">
+        <div class="player-info"><b id="p-title">Nova Sounds</b><br><small id="p-artist">Плеер</small></div>
+        <audio id="main-audio" controls style="height: 30px; filter: invert(1);"></audio>
     </div>
 
     <script src="app.js"></script>
