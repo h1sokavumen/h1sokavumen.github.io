@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:10000"; // Пока тестируем локально. Потом поменяем на Render.
+const API_URL = "https://vortex-dtd5.onrender.com"; // Пока тестируем локально. Потом поменяем на Render.
 
 let currentUser = null; // Храним данные вошедшего пользователя
 let isLoginMode = true; // Переключатель логин/регистрация
