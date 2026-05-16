@@ -14,11 +14,11 @@
         <ul class="nav-links">
             <li class="active" onclick="switchTab('recommendations')">Рекомендации</li>
             <li onclick="switchTab('friends')">Друзья</li>
-            <li onclick="switchTab('profile')">Мой Профиль</li>
+            <li onclick="switchTab('profile')">Профиль</li>
             <li onclick="switchTab('settings')">Настройки</li>
             <li id="nav-admin" style="display: none;" onclick="switchTab('admin')">Админ</li>
         </ul>
-        <div id="auth-section"></div>
+        <div id="auth-section"><button class="glass-btn" onclick="openModal('auth-modal')">Войти</button></div>
     </nav>
 
     <main id="content">
@@ -27,92 +27,59 @@
             <div id="tracks-container" class="music-grid"></div>
         </div>
         
-        <!-- ВКЛАДКА ДРУЗЬЯ С ПОИСКОМ -->
         <div id="friends" class="tab-content">
-            <h2>Найти друзей</h2>
-            <div class="search-container glass-panel" style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <input type="text" id="friend-search-input" class="glass-input" placeholder="Введите имя пользователя..." style="margin-bottom: 0;">
+            <h2>Найти людей</h2>
+            <div class="search-box glass-panel">
+                <input type="text" id="f-search" class="glass-input" placeholder="Введите ник...">
                 <button class="glass-btn accent" onclick="searchFriends()">Найти</button>
             </div>
-            <div id="friends-results" class="music-grid">
-                <p class="center-message" id="search-msg">Тут появятся результаты поиска</p>
-            </div>
+            <div id="friends-results" class="music-grid" style="margin-top:20px;"></div>
         </div>
 
         <div id="profile" class="tab-content">
-            <div id="self-profile-view"></div>
-            <h3 style="margin-top: 30px;">Мои прикрепленные треки</h3>
-            <div id="pinned-tracks-container" class="music-grid"></div>
+            <div id="profile-view"></div>
+            <h3 style="margin: 20px 0;">Мои треки 📌</h3>
+            <div id="pinned-container" class="music-grid"></div>
         </div>
 
         <div id="admin" class="tab-content">
             <h2>Админ Панель</h2>
-            <div class="admin-grid">
-                <div class="glass-panel p-20">
-                    <h3>Загрузить MP3 с ПК</h3>
-                    <input type="file" id="track-file" class="glass-input" accept="audio/mp3">
-                    <input type="text" id="track-artist" class="glass-input" placeholder="Исполнитель">
-                    <button class="glass-btn accent w-100" onclick="uploadTrack()">Опубликовать на сайт</button>
-                </div>
-                <div class="glass-panel p-20">
-                    <h3>Управление правами</h3>
-                    <input type="text" id="grant-username" class="glass-input" placeholder="Ник пользователя">
-                    <div style="display: flex; gap: 10px;">
-                        <button class="glass-btn w-100" onclick="grantRights('premium')">Премиум</button>
-                        <button class="glass-btn w-100 accent" onclick="grantRights('admin')">Админ</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="settings" class="tab-content">
-            <h2>Настройки</h2>
             <div class="glass-panel p-20">
-                <label>Тема оформления:</label>
-                <select id="theme-selector" class="glass-input" onchange="changeTheme()">
-                    <option value="dark-classic">Черная классика</option>
-                    <option value="purple-dark">Фиолетовый градиент</option>
-                    <option value="green-dark">Зеленый градиент</option>
-                    <option value="blue-white">Голубой шлейф</option>
-                    <option value="white-classic">Светлая тема</option>
-                </select>
+                <h3>Загрузить MP3</h3>
+                <input type="file" id="track-file" class="glass-input" accept="audio/mp3">
+                <input type="text" id="track-artist" class="glass-input" placeholder="Автор">
+                <button class="glass-btn accent w-100" onclick="uploadTrack()">Опубликовать</button>
             </div>
         </div>
-    </main>
+    </nav>
 
     <div class="music-player">
-        <div class="player-info"><b id="p-title">Nova Sounds</b><br><small id="p-artist">Плеер</small></div>
-        <audio id="main-audio" controls style="filter: invert(1); height: 35px;"></audio>
+        <div class="p-info"><b id="p-title">Nova Sounds</b><br><small id="p-artist">Плеер</small></div>
+        <audio id="main-audio" controls style="filter:invert(1); height:35px;"></audio>
     </div>
 
-    <!-- Модалка просмотра чужого профиля -->
-    <div id="view-user-modal" class="modal">
-        <div class="modal-content glass-panel" style="width: 90%; max-width: 500px; padding: 0; overflow: hidden;">
-            <div id="v-user-banner" class="banner" style="height: 120px; background-color: #222; background-size: cover;"></div>
-            <div style="padding: 20px; text-align: center; margin-top: -50px;">
-                <img id="v-user-avatar" src="" class="avatar" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid #000;">
-                <h2 id="v-user-name"></h2>
-                <p id="v-user-bio" style="margin-bottom: 20px; opacity: 0.8;"></p>
-                <button class="glass-btn w-100" onclick="closeModal('view-user-modal')">Закрыть</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модалка настроек своего профиля -->
-    <div id="edit-profile-modal" class="modal">
+    <!-- МОДАЛКА ВХОДА С ПЕРЕКЛЮЧАТЕЛЕМ -->
+    <div id="auth-modal" class="modal">
         <div class="modal-content glass-panel">
-            <h2>Настройки профиля</h2>
-            <p style="text-align: left; font-size: 12px; margin-bottom: 5px;">Аватарка:</p>
-            <input type="file" id="edit-avatar-file" class="glass-input" accept="image/*">
-            <p style="text-align: left; font-size: 12px; margin-bottom: 5px;">Баннер:</p>
-            <input type="file" id="edit-banner-file" class="glass-input" accept="image/*">
-            <textarea id="edit-bio" class="glass-input" placeholder="О себе..."></textarea>
-            <button class="glass-btn accent w-100" onclick="saveProfile()">Сохранить изменения</button>
-            <button class="glass-btn w-100 mt-10" onclick="closeModal('edit-profile-modal')">Отмена</button>
+            <h2 id="modal-title">Вход</h2>
+            <input type="text" id="auth-user" class="glass-input" placeholder="Никнейм">
+            <input type="password" id="auth-pass" class="glass-input" placeholder="Пароль">
+            <button class="glass-btn accent w-100" onclick="submitAuth()">Подтвердить</button>
+            <p class="toggle-auth" style="margin-top:15px; cursor:pointer; text-decoration:underline;" onclick="toggleAuth()">Регистрация</p>
         </div>
     </div>
 
-    <div id="auth-modal" class="modal"><div class="modal-content glass-panel"><h2 id="modal-title">Вход</h2><input type="text" id="auth-username" class="glass-input" placeholder="Ник"><input type="password" id="auth-password" class="glass-input" placeholder="Пароль"><button class="glass-btn accent w-100" onclick="submitAuth()">Войти</button><p class="toggle-auth" onclick="toggleAuthMode()">Регистрация</p></div></div>
+    <!-- Модалка настройки профиля -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content glass-panel">
+            <h2>Настройки</h2>
+            <input type="file" id="edit-av" class="glass-input" accept="image/*">
+            <input type="file" id="edit-bn" class="glass-input" accept="image/*">
+            <textarea id="edit-bio" class="glass-input" placeholder="О себе"></textarea>
+            <button class="glass-btn accent w-100" onclick="saveProfile()">Сохранить</button>
+            <button class="glass-btn w-100 mt-10" onclick="closeModal('edit-modal')">Отмена</button>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>
