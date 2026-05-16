@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark-classic">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Sounds</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Видео на фон (СЮДА ДОБАВЬ СВОЙ ПУТЬ К ВИДЕО) -->
+    <video autoplay loop muted id="bg-video">
+        <source src="background.mp4" type="video/mp4">
+    </video>
+
+    <!-- Блюр меню сверху -->
+    <nav class="glass-menu">
+        <div class="logo">
+            <!-- Красивое SVG лого -->
+            <svg width="30" height="30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 90 L50 10 L90 90 Z" fill="black" stroke="white" stroke-width="5"/>
+                <circle cx="50" cy="65" r="10" fill="white"/>
+            </svg>
+            <span>Nova Sounds</span>
+        </div>
+        <ul class="nav-links">
+            <li class="active" onclick="switchTab('recommendations')">Рекомендации</li>
+            <li onclick="switchTab('favorites')">Любимое</li>
+            <li onclick="switchTab('friends')">Друзья</li>
+            <li onclick="switchTab('profile')">Профиль</li>
+            <li onclick="switchTab('settings')">Настройки</li>
+        </ul>
+        <div class="auth-buttons">
+            <button onclick="openModal('login')">Войти</button>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <main id="content">
+        <!-- Контент будет меняться через JS -->
+        <div id="recommendations" class="tab-content active">
+            <h2>Рекомендации</h2>
+            <p>Слушай лучшие треки площадки бесплатно.</p>
+            <!-- Сюда JS будет добавлять треки -->
+            <div id="tracks-container"></div>
+        </div>
+        
+        <div id="friends" class="tab-content">
+            <h2>Друзья</h2>
+            <input type="text" class="search-bar" placeholder="Поиск по никнейму...">
+            <div class="center-message">У вас пока нет друзей</div>
+        </div>
+
+        <div id="settings" class="tab-content">
+            <h2>Настройки</h2>
+            <div class="setting-item">
+                <label>Тема оформления:</label>
+                <select id="theme-selector" onchange="changeTheme()">
+                    <option value="dark-classic">Черная классика + белый</option>
+                    <option value="purple-dark">Фиолетовый градиент + черный</option>
+                    <option value="white-classic">Белая классика + черный</option>
+                    <option value="green-dark">Зеленый градиент + черный</option>
+                    <option value="blue-white">Голубой + белый</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <button class="buy-sub">Купить подписку (30 грн)</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Плеер снизу -->
+    <div class="music-player">
+        <div class="track-info">
+            <div class="track-art"></div>
+            <div>
+                <h4 id="player-title">Ничего не играет</h4>
+                <p id="player-artist">-</p>
+            </div>
+            <!-- Кнопка лайка -->
+            <svg class="heart-btn" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <div class="controls">
+            <button>⏮</button>
+            <button id="play-pause">▶</button>
+            <button>⏭</button>
+        </div>
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

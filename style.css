@@ -1,0 +1,136 @@
+/* Переменные для смены тем */
+:root[data-theme="dark-classic"] {
+    --bg-overlay: rgba(10, 10, 10, 0.7);
+    --glass-bg: rgba(20, 20, 20, 0.4);
+    --text-color: #ffffff;
+    --accent: #ffffff;
+}
+:root[data-theme="purple-dark"] {
+    --bg-overlay: linear-gradient(135deg, rgba(20,0,30,0.8), rgba(0,0,0,0.9));
+    --glass-bg: rgba(40, 10, 60, 0.4);
+    --text-color: #ffffff;
+    --accent: #b366ff;
+}
+:root[data-theme="white-classic"] {
+    --bg-overlay: rgba(240, 240, 240, 0.8);
+    --glass-bg: rgba(255, 255, 255, 0.5);
+    --text-color: #1a1a1a;
+    --accent: #000000;
+}
+/* Остальные темы добавим по аналогии... */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    color: var(--text-color);
+    overflow: hidden; /* Чтобы не скроллился весь экран, только внутри вкладок */
+}
+
+/* Видео на фоне */
+#bg-video {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+    z-index: -2;
+    object-fit: cover;
+}
+
+/* Затемнение видео в зависимости от темы */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--bg-overlay);
+    z-index: -1;
+    transition: background 0.5s ease;
+}
+
+/* Блюр меню (Glassmorphism) */
+.glass-menu {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 95%;
+    max-width: 1200px;
+    height: 60px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 100;
+}
+
+.logo { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 1.2rem;}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+    list-style: none;
+}
+
+.nav-links li {
+    cursor: pointer;
+    padding: 5px 15px;
+    border-radius: 20px;
+    transition: 0.3s;
+}
+
+.nav-links li:hover, .nav-links li.active {
+    background: rgba(255,255,255,0.1);
+    box-shadow: 0 0 10px rgba(255,255,255,0.1);
+}
+
+.auth-buttons button {
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--text-color);
+    padding: 8px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+}
+
+/* Плеер */
+.music-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 90px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    z-index: 100;
+}
+
+.heart-btn { width: 24px; height: 24px; fill: none; stroke: var(--text-color); stroke-width: 2; cursor: pointer; transition: 0.3s; margin-left: 15px; }
+.heart-btn.active { fill: var(--accent); stroke: var(--accent); }
+
+.tab-content { display: none; padding: 100px 20px 100px; height: 100vh; overflow-y: auto; max-width: 1200px; margin: 0 auto;}
+.tab-content.active { display: block; }
+
+.center-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.5; }
+.search-bar { width: 100%; padding: 15px; border-radius: 15px; border: none; background: rgba(255,255,255,0.1); color: var(--text-color); outline: none; margin-bottom: 20px;}
+
+/* Адаптивность для телефонов */
+@media (max-width: 768px) {
+    .nav-links { display: none; /* Потом сделаем бургер-меню */ }
+    .music-player { padding: 0 10px; }
+}
