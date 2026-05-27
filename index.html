@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Maloshko Shop">
+<meta name="theme-color" content="#1a0d00">
+<title>Maloshko Shop</title>
+<style>
+/* === SYSTEM FONTS — no external deps === */
+:root {
+  --cream: #f5e6c8;
+  --brown: #5c3d1e;
+  --gold: #c9a84c;
+  --green: #4a7c59;
+  --paper: #f0dba0;
+  --F1: 'Georgia', 'Times New Roman', serif;
+  --F2: 'Courier New', 'Courier', monospace;
+  --F3: 'Arial Black', 'Impact', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  width:100%; height:100%;
+  overflow:hidden;
+  background:#0d1400;
+  font-family: var(--F1);
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+/* SCREENS */
+.screen { position:absolute; inset:0; display:none; overflow:hidden; }
+.screen.active { display:block; }
+
+/* ===== LOADING ===== */
+#loading-screen {
+  background: radial-gradient(ellipse at center, #1a2a10 0%, #0a1400 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:16px;
+}
+.ld-title {
+  font-family: var(--F3);
+  font-size: clamp(28px,7vw,60px);
+  color: #c9a84c;
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px rgba(201,168,76,0.6), 3px 3px 0 #5a3000;
+  text-align: center;
+  animation: glow 1.5s ease-in-out infinite;
+}
+@keyframes glow {
+  0%,100% { text-shadow: 0 0 20px rgba(201,168,76,0.5), 3px 3px 0 #5a3000; }
+  50%      { text-shadow: 0 0 40px rgba(201,168,76,0.9), 3px 3px 0 #5a3000; }
+}
+.ld-sub {
+  font-family: var(--F2);
+  color: rgba(200,180,100,0.6);
+  font-size: 12px;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+}
+.ld-bar-bg {
+  width: min(300px, 80vw);
+  height: 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(201,168,76,0.2);
+}
+.ld-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #c9a84c, #ffe566);
+  border-radius: 4px;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+.ld-tip {
+  font-family: var(--F2);
+  font-size: 11px;
+  color: rgba(200,180,100,0.4);
+  letter-spacing: 2px;
+}
+
+/* ===== MENU ===== */
+#menu-screen { background: #0d1b2a; }
+.menu-sky {
+  position:absolute; inset:0;
+  background: linear-gradient(180deg,
+    #0a1520 0%, #1a3a5c 20%, #2d6a8a 38%, #87ceeb 50%,
+    #5a9e4a 62%, #3d7a2d 75%, #2a5a1e 100%
+  );
+}
+/* sun */
+.msun {
+  position:absolute; top:8%; left:50%; transform:translateX(-50%);
+  width:70px; height:70px;
+  background: radial-gradient(circle, #fff9a0 0%, #ffe566 40%, #ffaa00 100%);
+  border-radius:50%;
+  box-shadow:0 0 40px 20px rgba(255,200,0,0.4), 0 0 80px 40px rgba(255,150,0,0.2);
+  animation: sunbeat 3s ease-in-out infinite;
+}
+@keyframes sunbeat {
+  0%,100%{box-shadow:0 0 40px 20px rgba(255,200,0,0.4),0 0 80px 40px rgba(255,150,0,0.2)}
+  50%{box-shadow:0 0 55px 28px rgba(255,220,0,0.55),0 0 110px 55px rgba(255,160,0,0.3)}
+}
+/* mountains */
+.mmtns { position:absolute; bottom:36%; width:100%; }
+.mmt {
+  position:absolute; bottom:0;
+  border-style:solid;
+  border-left-color:transparent; border-right-color:transparent;
+}
+/* river */
+.mriver {
+  position:absolute; bottom:27%; left:8%; width:84%; height:28px;
+  background:linear-gradient(90deg,transparent,#4a9ebb 15%,#7acce8 50%,#4a9ebb 85%,transparent);
+  border-radius:50%; opacity:0.85;
+}
+.mriver::after {
+  content:''; position:absolute; top:6px; left:15%; width:70%; height:7px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.55),transparent);
+  animation:rshim 2s ease-in-out infinite;
+}
+@keyframes rshim{0%,100%{opacity:0.3}50%{opacity:0.9}}
+/* grass */
+.mgrass {
+  position:absolute; bottom:0; width:100%; height:32%;
+  background:linear-gradient(180deg,#5a9e4a 0%,#3d7a2d 45%,#2a5520 100%);
+}
+/* clouds */
+.mcld {
+  position:absolute;
+  background:rgba(255,255,255,0.82);
+  border-radius:50px;
+}
+.mcld::before,.mcld::after {
+  content:''; position:absolute;
+  background:rgba(255,255,255,0.82);
+  border-radius:50%;
+}
+.mc1{width:100px;height:28px;top:14%;left:-120px;animation:cldmv 18s linear infinite}
+.mc1::before{width:48px;height:48px;top:-20px;left:14px}
+.mc1::after{width:34px;height:34px;top:-14px;left:44px}
+.mc2{width:70px;height:20px;top:22%;left:-90px;animation:cldmv 25s linear 7s infinite}
+.mc2::before{width:34px;height:34px;top:-14px;left:10px}
+.mc2::after{width:24px;height:24px;top:-10px;left:30px}
+.mc3{width:88px;height:24px;top:9%;left:-110px;animation:cldmv 21s linear 3s infinite}
+.mc3::before{width:44px;height:44px;top:-18px;left:12px}
+.mc3::after{width:30px;height:30px;top:-12px;left:40px}
+@keyframes cldmv{from{left:-140px}to{left:110%}}
+/* birds */
+.mbird{position:absolute;animation:bfly linear infinite;}
+.mbird svg{animation:bwing 0.4s ease-in-out infinite alternate;}
+@keyframes bfly{from{left:-60px}to{left:110%}}
+@keyframes bwing{from{transform:scaleY(1)}to{transform:scaleY(0.3)}}
+/* trees */
+.mtree-wrap{position:absolute;bottom:29%;}
+/* menu UI */
+.menu-ui {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center;
+  padding-top: clamp(20px,5vh,60px);
+  z-index:10;
+  pointer-events:none;
+}
+.menu-ui > * { pointer-events:auto; }
+.menu-title {
+  font-family: var(--F3);
+  font-size: clamp(32px,6.5vw,68px);
+  color:#fff;
+  text-shadow: 4px 4px 0 #7a2200, -1px -1px 0 #cc4400, 0 0 30px rgba(255,140,0,0.7);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  animation: glow 2s ease-in-out infinite;
+  line-height:1;
+}
+.menu-sub {
+  font-family: var(--F2);
+  font-size: clamp(9px,1.5vw,13px);
+  color:#f0dba0;
+  letter-spacing:5px;
+  margin-top:4px;
+  text-shadow:1px 1px 4px rgba(0,0,0,0.9);
+}
+.menu-panel {
+  margin-top:clamp(12px,2.5vh,24px);
+  background:rgba(10,5,0,0.82);
+  border:2px solid #c9a84c;
+  border-radius:4px;
+  padding: clamp(14px,2.5vh,24px) clamp(20px,4vw,44px);
+  min-width:240px;
+  display:flex; flex-direction:column; gap:9px;
+  box-shadow:0 0 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(201,168,76,0.04);
+  backdrop-filter:blur(6px);
+}
+.mbtn {
+  font-family: var(--F3);
+  font-size: clamp(14px,2.2vw,19px);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  padding:9px 18px;
+  border:2px solid;
+  border-radius:2px;
+  cursor:pointer;
+  transition:all 0.12s;
+  position:relative; overflow:hidden;
+  outline:none;
+}
+.mbtn:active{transform:scale(0.96)}
+.mbtn-new{background:rgba(74,124,89,0.25);border-color:#4a7c59;color:#a8ddb5}
+.mbtn-new:hover{background:rgba(74,124,89,0.6);color:#fff;border-color:#a8ddb5}
+.mbtn-cont{background:rgba(201,168,76,0.2);border-color:#c9a84c;color:#f0dba0}
+.mbtn-cont:hover{background:rgba(201,168,76,0.5);color:#fff}
+.mbtn-set{background:rgba(100,100,160,0.2);border-color:#7a7abf;color:#b0b0e8}
+.mbtn-set:hover{background:rgba(100,100,160,0.5);color:#fff}
+.mbtn-don{background:rgba(200,60,60,0.2);border-color:#cc4444;color:#f0a0a0}
+.mbtn-don:hover{background:rgba(200,60,60,0.5);color:#fff}
+.menu-ver{font-family:var(--F2);font-size:10px;color:rgba(200,180,100,0.35);text-align:center;letter-spacing:2px;margin-top:2px}
+
+/* ===== MODALS ===== */
+.moverlay {
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.75);
+  z-index:1000;
+  display:none;align-items:center;justify-content:center;
+}
+.moverlay.on{display:flex}
+.mbox {
+  background:linear-gradient(135deg,#2a1a0a,#180e00);
+  border:3px solid #c9a84c;
+  border-radius:4px;
+  padding:28px 36px;
+  min-width:260px; max-width:380px; width:90vw;
+  box-shadow:0 0 40px rgba(0,0,0,0.95);
+}
+.mbox-title {
+  font-family:var(--F3);
+  font-size:18px; color:#c9a84c;
+  letter-spacing:3px; text-transform:uppercase;
+  text-align:center; margin-bottom:18px;
+  border-bottom:1px solid rgba(201,168,76,0.25);
+  padding-bottom:10px;
+}
+.set-row{display:flex;align-items:center;justify-content:space-between;margin:10px 0}
+.set-lbl{font-family:var(--F1);color:#f0dba0;font-size:13px}
+.set-sl{width:110px;accent-color:#c9a84c;cursor:pointer}
+.mclose {
+  display:block;width:100%;margin-top:18px;
+  font-family:var(--F3);font-size:14px;letter-spacing:2px;text-transform:uppercase;
+  padding:8px;
+  background:rgba(201,168,76,0.15);border:2px solid #c9a84c;
+  border-radius:2px;color:#f0dba0;cursor:pointer;transition:background 0.12s;
+}
+.mclose:hover{background:rgba(201,168,76,0.45)}
+.don-card {
+  font-family:var(--F2);font-size:22px;color:#ffe566;
+  text-align:center;letter-spacing:3px;
+  background:rgba(0,0,0,0.5);
+  border:1px solid rgba(255,229,102,0.3);
+  padding:12px;margin:14px 0;border-radius:3px;
+  cursor:pointer;transition:background 0.2s;
+}
+.don-card:hover{background:rgba(255,229,102,0.1)}
+.don-tip{font-size:11px;color:rgba(240,219,160,0.5);text-align:center;font-family:var(--F1)}
+
+/* ===== GAME SCREEN ===== */
+#game-screen { background:#1a0d00; }
+
+/* Shop scene */
+.g-wall {
+  position:absolute; inset:0;
+  background:linear-gradient(180deg,#c0902a 0%,#a07018 45%,#7a5010 100%);
+}
+.g-wallpaper {
+  position:absolute; inset:0;
+  background-image:
+    repeating-linear-gradient(90deg,transparent,transparent 47px,rgba(0,0,0,0.06) 47px,rgba(0,0,0,0.06) 50px),
+    repeating-linear-gradient(0deg,transparent,transparent 47px,rgba(0,0,0,0.06) 47px,rgba(0,0,0,0.06) 50px);
+}
+.g-floor {
+  position:absolute;bottom:0;width:100%;height:28%;
+  background:linear-gradient(180deg,#6b4a1e 0%,#4a3010 60%,#2a1a08 100%);
+  background-image:repeating-linear-gradient(90deg,transparent,transparent 57px,rgba(0,0,0,0.08) 57px,rgba(0,0,0,0.08) 60px);
+}
+.g-ceiling {
+  position:absolute;top:0;width:100%;height:6%;
+  background:linear-gradient(180deg,#3a2010,#5a3818);
+  border-bottom:3px solid #2a1408;
+}
+/* lamp */
+.g-lamp {
+  position:absolute; top:4%; left:50%; transform:translateX(-50%);
+  z-index:5;
+}
+.lamp-cord{width:2px;height:30px;background:#2a1408;margin:0 auto;}
+.lamp-shade{
+  width:60px;height:24px;
+  background:linear-gradient(180deg,#c8a040,#e8c060);
+  border-radius:0 0 30px 30px;
+  box-shadow:0 0 40px 15px rgba(255,200,80,0.3), 0 0 80px 30px rgba(255,180,40,0.15);
+}
+
+/* shelves */
+.g-shelves {
+  position:absolute; top:6%; left:0; right:32%;
+  bottom:28%;
+  display:flex; flex-direction:column; gap:2px;
+  padding:4px 6px;
+  overflow:hidden;
+}
+.g-shelf {
+  flex:1; min-height:0;
+  background:linear-gradient(180deg,#5c3d1e 0%,#4a2e10 80%,#3a2010 100%);
+  border-bottom:5px solid #2a1808;
+  border-radius:2px 2px 0 0;
+  display:flex; align-items:flex-end;
+  padding:3px 6px; gap:5px;
+  box-shadow:inset 0 8px 16px rgba(0,0,0,0.2), 0 3px 6px rgba(0,0,0,0.3);
+  position:relative; overflow:hidden;
+}
+.g-shelf::before{
+  content:''; position:absolute; top:0;left:0;right:0;height:5px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.12),transparent);
+}
+
+/* product items */
+.pitem {
+  cursor:pointer;
+  transition:transform 0.1s;
+  flex-shrink:0;
+  position:relative;
+}
+.pitem:hover{transform:translateY(-3px) scale(1.06)}
+.pitem.sel{transform:translateY(-6px) scale(1.12);filter:brightness(1.35) drop-shadow(0 0 6px rgba(255,220,0,0.9))}
+.ptip {
+  position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
+  background:rgba(10,5,0,0.97);border:1px solid #c9a84c;
+  border-radius:3px;padding:3px 7px;
+  white-space:nowrap;font-family:var(--F2);font-size:10px;color:#f0dba0;
+  pointer-events:none;opacity:0;transition:opacity 0.15s;z-index:200;margin-bottom:3px;
+}
+.pitem:hover .ptip{opacity:1}
+
+/* newspaper rack */
+.g-nprack {
+  position:absolute; bottom:28%; left:2%; z-index:12;
+}
+
+/* counter booth */
+.g-counter {
+  position:absolute; bottom:28%; right:0; width:33%; top:8%;
+  background:linear-gradient(135deg,#8b5e2a,#6b4818);
+  border-left:4px solid #4a2e10;
+  border-top:4px solid #4a2e10;
+  border-radius:8px 0 0 0;
+  z-index:20;
+}
+.g-counter-win {
+  position:absolute; top:6%; left:6%; right:6%; height:42%;
+  background:rgba(100,170,210,0.25);
+  border:3px solid #4a2e10;
+  border-radius:4px;
+  backdrop-filter:blur(2px);
+}
+.g-counter-shelf {
+  position:absolute; bottom:0; left:0; right:0; height:28%;
+  background:linear-gradient(180deg,#c8a040,#9a7820);
+  border-top:4px solid #6b4818;
+  padding:6px 8px;
+}
+/* seller character */
+.g-seller {
+  position:absolute; bottom:1%; right:34%;
+  z-index:25; width:55px;
+}
+
+/* calculator */
+.g-calc {
+  position:absolute; top:7%; right:35%;
+  z-index:30;
+  background:#1e2e1e;
+  border:2px solid #0e1e0e;
+  border-radius:6px;
+  padding:7px;
+  box-shadow:2px 2px 8px rgba(0,0,0,0.6);
+  width:120px;
+}
+.calc-disp {
+  background:#0e1e0e;color:#00ff55;
+  font-family:var(--F2);font-size:17px;
+  text-align:right;padding:3px 6px;
+  border-radius:2px;min-height:24px;
+  letter-spacing:1px;border:1px solid #060e06;
+  overflow:hidden;
+}
+.calc-grd {
+  display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:4px;
+}
+.cbtn {
+  background:#2e3e2e;border:1px solid #0e1e0e;border-radius:2px;
+  color:#b0d8b0;font-family:var(--F2);font-size:13px;
+  padding:3px 2px;cursor:pointer;text-align:center;
+  transition:background 0.08s;
+  -webkit-tap-highlight-color:transparent;
+}
+.cbtn:hover{background:#3e4e3e}
+.cbtn:active{background:#1e2e1e;transform:scale(0.94)}
+.cbtn.op{color:#ffe555;background:#2e2e1e}
+.cbtn.eq{background:#3e6e3e;color:#fff}
+.cbtn.cl{background:#6e2e2e;color:#ffaaaa;font-size:11px}
+
+/* customer */
+.g-cust {
+  position:absolute; bottom:29%; left:7%;
+  z-index:40;
+  display:none;
+  animation:cwalk 0.4s ease forwards;
+}
+.g-cust.vis{display:block}
+@keyframes cwalk{from{transform:translateX(-50px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* speech bubble */
+.g-bubble {
+  position:absolute; bottom:62%; left:5%;
+  max-width: min(260px, 55vw);
+  background:#fff9ec;border:3px solid #8b5e2a;
+  border-radius:12px 12px 12px 0;
+  padding:9px 14px;
+  font-family:var(--F1);font-size:clamp(11px,1.5vw,13px);
+  color:#3a2010;line-height:1.45;
+  box-shadow:3px 3px 8px rgba(0,0,0,0.35);
+  z-index:50;
+  display:none;
+  animation:bpop 0.25s ease;
+}
+.g-bubble.vis{display:block}
+@keyframes bpop{from{transform:scale(0.75);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* HUD */
+.g-hud {
+  position:absolute;top:0;left:0;right:0;height:48px;
+  background:linear-gradient(180deg,rgba(15,8,0,0.97),rgba(15,8,0,0.75));
+  border-bottom:2px solid #c9a84c;
+  display:flex;align-items:center;padding:0 12px;gap:18px;
+  z-index:100;
+}
+.hud-lbl{font-family:var(--F2);font-size:10px;color:rgba(201,168,76,0.65);letter-spacing:2px;text-transform:uppercase}
+.hud-val{font-family:var(--F2);font-size:20px;color:#ffe566;min-width:70px}
+.hud-sc{color:#a8ddb5}.hud-tm{color:#f0a080}
+.hud-mbtn {
+  margin-left:auto;
+  font-family:var(--F3);font-size:11px;letter-spacing:1px;
+  padding:4px 10px;
+  background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.4);
+  color:#c9a84c;border-radius:2px;cursor:pointer;transition:background 0.12s;
+}
+.hud-mbtn:hover{background:rgba(201,168,76,0.3)}
+
+/* transaction panel */
+.g-tx {
+  position:absolute;bottom:3%;right:1%;
+  width:min(250px,48vw);
+  background:rgba(12,6,0,0.94);
+  border:2px solid #c9a84c;border-radius:4px;
+  padding:10px;z-index:50;
+}
+.tx-ttl{font-family:var(--F3);font-size:12px;color:#c9a84c;letter-spacing:2px;margin-bottom:7px;text-transform:uppercase;border-bottom:1px solid rgba(201,168,76,0.2);padding-bottom:5px}
+.tx-r{display:flex;justify-content:space-between;font-size:11px;color:#f0dba0;margin:3px 0;font-family:var(--F1)}
+.tx-r.ttl{border-top:1px solid rgba(201,168,76,0.25);margin-top:5px;padding-top:5px;font-weight:bold;color:#ffe566;font-size:13px}
+.tx-r.chng{color:#a8ddb5}
+.g-btns{display:flex;gap:5px;margin-top:8px}
+.g-btn{flex:1;font-family:var(--F3);font-size:11px;letter-spacing:1px;padding:6px 3px;border:1px solid;border-radius:2px;cursor:pointer;transition:all 0.1s;text-transform:uppercase;outline:none}
+.g-btn:active{transform:scale(0.95)}
+.g-btn-give{background:rgba(74,124,89,0.3);border-color:#4a7c59;color:#a8ddb5}
+.g-btn-give:hover{background:rgba(74,124,89,0.6)}
+.g-btn-give:disabled{opacity:0.28;cursor:not-allowed}
+.g-btn-skip{background:rgba(150,70,70,0.3);border-color:#964444;color:#f0a0a0}
+.g-btn-skip:hover{background:rgba(150,70,70,0.6)}
+
+/* notification */
+.g-notif {
+  position:fixed;top:60px;left:50%;transform:translateX(-50%);
+  background:rgba(12,6,0,0.97);border:2px solid #c9a84c;border-radius:3px;
+  padding:8px 22px;
+  font-family:var(--F1);font-size:13px;color:#f0dba0;
+  z-index:500;opacity:0;transition:opacity 0.25s;pointer-events:none;text-align:center;
+  max-width:85vw;
+}
+.g-notif.on{opacity:1}
+.g-notif.ok{border-color:#4a7c59;color:#a8ddb5}
+.g-notif.err{border-color:#cc4444;color:#f0a0a0}
+
+/* day end big message */
+.g-big {
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  z-index:900;background:rgba(0,0,0,0.78);
+  opacity:0;pointer-events:none;transition:opacity 0.4s;
+}
+.g-big.on{opacity:1;pointer-events:auto}
+.g-bigbox{
+  background:linear-gradient(135deg,#2a1a0a,#180e00);
+  border:3px solid #c9a84c;border-radius:6px;
+  padding:clamp(24px,5vw,44px) clamp(30px,6vw,60px);
+  text-align:center;max-width:90vw;
+}
+.g-bigtitle{font-family:var(--F3);font-size:clamp(24px,5vw,38px);color:#c9a84c;letter-spacing:3px;text-transform:uppercase;text-shadow:0 0 20px rgba(201,168,76,0.4)}
+.g-bigsub{font-family:var(--F1);font-size:14px;color:#f0dba0;margin:10px 0 22px;line-height:1.7}
+.g-bigbtn{font-family:var(--F3);font-size:14px;letter-spacing:2px;padding:10px 28px;background:rgba(201,168,76,0.18);border:2px solid #c9a84c;color:#f0dba0;border-radius:2px;cursor:pointer;transition:background 0.12s;text-transform:uppercase;display:inline-block;margin:4px}
+.g-bigbtn:hover{background:rgba(201,168,76,0.45)}
+
+/* receipt */
+.g-receipt {
+  position:fixed;inset:0;background:rgba(0,0,0,0.72);
+  z-index:800;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 0.25s;
+}
+.g-receipt.on{opacity:1;pointer-events:auto}
+.rcpt-paper {
+  background:#fff8e8;width:190px;padding:14px 10px;
+  font-family:var(--F2);font-size:13px;color:#1a1a1a;line-height:1.7;
+  box-shadow:4px 4px 20px rgba(0,0,0,0.5);position:relative;
+}
+.rcpt-top,.rcpt-bot {
+  height:10px;
+  background:repeating-linear-gradient(90deg,#fff8e8 0px,#fff8e8 8px,transparent 8px,transparent 16px);
+  margin:0 -10px;
+}
+.rcpt-top{margin-bottom:10px;margin-top:-14px}
+.rcpt-bot{margin-top:10px;margin-bottom:-14px}
+.rcpt-hd{text-align:center;letter-spacing:2px;border-bottom:1px dashed #999;padding-bottom:5px;margin-bottom:6px;font-size:14px}
+.rcpt-ln{display:flex;justify-content:space-between;font-size:12px}
+.rcpt-tot{border-top:1px dashed #999;padding-top:5px;margin-top:4px;font-size:15px;font-weight:bold;display:flex;justify-content:space-between}
+.rcpt-x{position:absolute;top:-10px;right:-10px;width:22px;height:22px;background:#bb3333;border:2px solid #881111;border-radius:50%;color:#fff;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* dust particles */
+.dp{position:absolute;width:2px;height:2px;background:rgba(255,210,120,0.45);border-radius:50%;animation:dfloat linear infinite;pointer-events:none}
+@keyframes dfloat{0%{opacity:0;transform:translateY(0) translateX(0)}20%{opacity:0.7}80%{opacity:0.25}100%{opacity:0;transform:translateY(-70px) translateX(15px)}}
+
+/* day/night */
+.g-dn{position:absolute;inset:0;pointer-events:none;z-index:88;transition:background 50s linear}
+
+/* req product highlight */
+.req{display:inline;background:rgba(201,168,76,0.22);border:1px solid rgba(201,168,76,0.55);border-radius:2px;padding:0 3px;color:#ffe555;font-weight:bold}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="ls" class="screen active">
+  <div class="ld-title">MALOSHKO<br>SHOP</div>
+  <div class="ld-sub">симулятор продавца</div>
+  <div class="ld-bar-bg"><div class="ld-bar" id="ldBar"></div></div>
+  <div class="ld-tip" id="ldTip">ИНИЦИАЛИЗАЦИЯ...</div>
+</div>
+
+<!-- MENU -->
+<div id="ms" class="screen">
+  <div class="menu-sky"></div>
+  <div class="msun"></div>
+  <div class="mcld mc1"></div>
+  <div class="mcld mc2"></div>
+  <div class="mcld mc3"></div>
+  <div id="mbirds"></div>
+  <div class="mmtns" id="mmtns"></div>
+  <div class="mriver"></div>
+  <div class="mgrass"></div>
+  <div id="mtrees"></div>
+  <div class="menu-ui">
+    <div class="menu-title">Maloshko Shop</div>
+    <div class="menu-sub">СИМУЛЯТОР ПРОДАВЦА · 1987</div>
+    <div class="menu-panel" id="menuPanel">
+      <button class="mbtn mbtn-new" onclick="startNew()">▶ НОВАЯ ИГРА</button>
+      <button class="mbtn mbtn-cont" id="contBtn" style="display:none" onclick="loadContinue()">↩ ПРОДОЛЖИТЬ</button>
+      <button class="mbtn mbtn-set" onclick="openSet()">⚙ НАСТРОЙКИ</button>
+      <button class="mbtn mbtn-don" onclick="openDon()">♥ ПОЖЕРТВОВАТЬ</button>
+      <div class="menu-ver">v1.0 © 1987 MALOSHKO ENTERPRISES</div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="gs" class="screen">
+  <div class="g-wall"></div>
+  <div class="g-wallpaper"></div>
+  <div class="g-floor"></div>
+  <div class="g-ceiling"></div>
+  <div class="g-lamp">
+    <div class="lamp-cord"></div>
+    <div class="lamp-shade"></div>
+  </div>
+  <div class="g-shelves" id="shelves"></div>
+  <div class="g-nprack" id="nprack"></div>
+  <div class="g-counter">
+    <div class="g-counter-win"></div>
+    <div class="g-counter-shelf"></div>
+  </div>
+  <div class="g-seller" id="seller"></div>
+  <div class="g-calc">
+    <div class="calc-disp" id="cd">0</div>
+    <div class="calc-grd" id="cg"></div>
+  </div>
+  <div class="g-cust" id="cust"></div>
+  <div class="g-bubble" id="bubble"></div>
+  <div class="g-dn" id="dn"></div>
+  <div id="dust"></div>
+
+  <!-- HUD -->
+  <div class="g-hud">
+    <div><div class="hud-lbl">ДЕНЬГИ</div><div class="hud-val" id="hm">₴0.00</div></div>
+    <div><div class="hud-lbl">СЧЁТ</div><div class="hud-val hud-sc" id="hs">0</div></div>
+    <div><div class="hud-lbl">КЛИЕНТЫ</div><div class="hud-val hud-tm" id="hc">0</div></div>
+    <div><div class="hud-lbl">ВРЕМЯ</div><div class="hud-val" id="ht">08:00</div></div>
+    <button class="hud-mbtn" onclick="toMenu()">МЕНЮ</button>
+  </div>
+
+  <!-- Transaction -->
+  <div class="g-tx">
+    <div class="tx-ttl">📋 КАССА</div>
+    <div class="tx-r"><span>Запрос:</span><span id="txP">—</span></div>
+    <div class="tx-r"><span>Цена:</span><span id="txPr">—</span></div>
+    <div class="tx-r"><span>Получено:</span><span id="txR">—</span></div>
+    <div class="tx-r ttl chng"><span>СДАЧА:</span><span id="txC">—</span></div>
+    <div class="g-btns">
+      <button class="g-btn g-btn-give" id="btnGive" onclick="giveP()" disabled>✓ ВЫДАТЬ</button>
+      <button class="g-btn g-btn-skip" onclick="skipC()">✗ ОТКАЗ</button>
+    </div>
+  </div>
+
+  <div class="g-notif" id="notif"></div>
+
+  <!-- End of day -->
+  <div class="g-big" id="bigMsg">
+    <div class="g-bigbox">
+      <div class="g-bigtitle" id="bigT">КОНЕЦ ДНЯ</div>
+      <div class="g-bigsub" id="bigS"></div>
+      <button class="g-bigbtn" onclick="nextDay()">СЛЕДУЮЩИЙ ДЕНЬ</button>
+      <button class="g-bigbtn" onclick="toMenu()">ГЛАВНОЕ МЕНЮ</button>
+    </div>
+  </div>
+
+  <!-- Receipt -->
+  <div class="g-receipt" id="rcpt">
+    <div class="rcpt-paper">
+      <div class="rcpt-top"></div>
+      <div class="rcpt-hd">МАГАЗИН<br>МАЛОШКО</div>
+      <div id="rcptBody"></div>
+      <div class="rcpt-bot"></div>
+      <div class="rcpt-x" onclick="closeRcpt()">✕</div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="moverlay" id="setMod">
+  <div class="mbox">
+    <div class="mbox-title">⚙ НАСТРОЙКИ</div>
+    <div class="set-row"><span class="set-lbl">🎵 Музыка</span><input type="range" class="set-sl" id="slM" min="0" max="100" value="60" oninput="sV('m',this.value)"></div>
+    <div class="set-row"><span class="set-lbl">🔊 Звуки</span><input type="range" class="set-sl" id="slS" min="0" max="100" value="80" oninput="sV('s',this.value)"></div>
+    <div class="set-row"><span class="set-lbl">🌿 Природа</span><input type="range" class="set-sl" id="slN" min="0" max="100" value="40" oninput="sV('n',this.value)"></div>
+    <div class="set-row"><span class="set-lbl">⏱ Скорость</span><input type="range" class="set-sl" id="slSp" min="0.5" max="3" value="1" step="0.5"></div>
+    <button class="mclose" onclick="closeSet()">ЗАКРЫТЬ</button>
+  </div>
+</div>
+
+<!-- DONATE MODAL -->
+<div class="moverlay" id="donMod">
+  <div class="mbox">
+    <div class="mbox-title">♥ ПОДДЕРЖАТЬ АВТОРА</div>
+    <p style="font-family:var(--F1);color:#f0dba0;font-size:13px;text-align:center;line-height:1.7">Если игра понравилась —<br>поддержите разработчика!</p>
+    <div class="don-card" onclick="copyCard()">4874 0700 2495 5450</div>
+    <div class="don-tip">Нажмите на номер чтобы скопировать<br>Спасибо! ❤️</div>
+    <button class="mclose" onclick="closeDon()">ЗАКРЫТЬ</button>
+  </div>
+</div>
+
+<script>
+// ================================================================
+//  MALOSHKO SHOP — Complete Game Engine
+// ================================================================
+
+// ---- DATA ----
+const PRODS = [
+  {id:'bread',     name:'Хлеб',      price:0.30, c1:'#c8884a', c2:'#a06030'},
+  {id:'milk',      name:'Молоко',    price:0.40, c1:'#f0f0f0', c2:'#cccccc'},
+  {id:'sugar',     name:'Сахар',     price:0.55, c1:'#f0e8c8', c2:'#d0c898'},
+  {id:'salt',      name:'Соль',      price:0.20, c1:'#e8e8e8', c2:'#bbbbbb'},
+  {id:'matches',   name:'Спички',    price:0.10, c1:'#d04a20', c2:'#a03010'},
+  {id:'canned',    name:'Тушёнка',   price:0.90, c1:'#7a9a5a', c2:'#5a7a3a'},
+  {id:'vodka',     name:'Водка',     price:2.80, c1:'#ddeeff', c2:'#aaccee'},
+  {id:'cigarettes',name:'Сигареты',  price:0.35, c1:'#e8c87a', c2:'#c8a05a'},
+  {id:'newspaper', name:'Газета',    price:0.05, c1:'#f5f0e0', c2:'#d8d0b8'},
+  {id:'butter',    name:'Масло',     price:0.65, c1:'#ffe080', c2:'#e0c060'},
+  {id:'tea',       name:'Чай',       price:0.45, c1:'#a06830', c2:'#7a4a18'},
+  {id:'macaroni',  name:'Макароны',  price:0.38, c1:'#e8c870', c2:'#c8a040'},
+];
+
+const CTYPES = [
+  {id:'granny', name:'Бабушка', pitch:1.4, rate:0.72},
+  {id:'man',    name:'Мужик',   pitch:0.65,rate:1.0},
+  {id:'woman',  name:'Женщина', pitch:1.15,rate:0.95},
+  {id:'child',  name:'Ребёнок', pitch:1.7, rate:1.15},
+  {id:'oldman', name:'Дедушка', pitch:0.55,rate:0.68},
+];
+
+const PHRASES = {
+  granny:['Деточка, дай {p}, у меня {m} рублей.','Голубчик, {p} дай. Вот {m} рублей.','Мне {p} пожалуйста, держи {m}.'],
+  man:   ['Эй, {p} давай! На {m} рублей.','Дай {p}. Деньги — {m} рублей.','Мне {p}. Вот {m}.'],
+  woman: ['Будьте добры, {p}. Вот {m} рублей.','Мне нужен {p}. Держите {m} рублей.','{p} пожалуйста. Вот {m}.'],
+  child: ['Тётя/дядя, {p}! Мама дала {m} рублей!','Хочу {p}! У меня {m} рублей!','Дайте {p}! Вот {m} рублей, хватит?'],
+  oldman:['Продай {p}. Деньги есть — {m}.','Мне {p}, сынок. Вот {m} рублей.','Слышь, {p} есть? На {m} рублей.'],
+};
+
+// ---- SVG HELPERS ----
+function svgProd(p, sz) {
+  const s = sz||44;
+  const shapes = {
+    bread:`<rect x="4" y="${s*.25}" width="${s-8}" height="${s*.5}" rx="${s*.12}" fill="${p.c1}"/><rect x="7" y="${s*.28}" width="${s-14}" height="${s*.12}" rx="2" fill="${p.c2}"/><rect x="7" y="${s*.44}" width="${s-14}" height="${s*.08}" rx="2" fill="${p.c2}" opacity=".6"/>`,
+    milk:`<rect x="${s*.22}" y="${s*.08}" width="${s*.56}" height="${s*.84}" rx="3" fill="${p.c1}"/><rect x="${s*.18}" y="${s*.05}" width="${s*.64}" height="${s*.18}" rx="2" fill="${p.c2}"/><text x="${s/2}" y="${s*.62}" text-anchor="middle" font-size="${s*.14}" fill="#4444aa" font-family="Arial">МЛК</text>`,
+    sugar:`<rect x="6" y="${s*.15}" width="${s-12}" height="${s*.7}" rx="2" fill="${p.c1}"/><text x="${s/2}" y="${s*.56}" text-anchor="middle" font-size="${s*.13}" fill="#888" font-family="Arial">САХАР</text>`,
+    salt:`<rect x="6" y="${s*.15}" width="${s-12}" height="${s*.7}" rx="2" fill="${p.c1}"/><text x="${s/2}" y="${s*.56}" text-anchor="middle" font-size="${s*.14}" fill="#888" font-family="Arial">СОЛЬ</text>`,
+    matches:`<rect x="${s*.22}" y="${s*.1}" width="${s*.56}" height="${s*.8}" rx="2" fill="${p.c1}"/><rect x="${s*.24}" y="${s*.12}" width="${s*.52}" height="${s*.15}" rx="1" fill="${p.c2}"/>`,
+    canned:`<ellipse cx="${s/2}" cy="${s/2}" rx="${s/2-3}" ry="${s/2-5}" fill="${p.c1}"/><ellipse cx="${s/2}" cy="${s/2}" rx="${s/2-8}" ry="${s/2-10}" fill="${p.c2}" opacity=".5"/>`,
+    vodka:`<rect x="${s*.3}" y="${s*.22}" width="${s*.4}" height="${s*.7}" rx="2" fill="${p.c1}"/><rect x="${s*.32}" y="${s*.14}" width="${s*.36}" height="${s*.15}" rx="2" fill="${p.c2}"/><rect x="${s*.3}" y="${s*.22}" width="${s*.4}" height="${s*.1}" fill="rgba(255,255,255,.3)"/>`,
+    cigarettes:`<rect x="${s*.14}" y="${s*.3}" width="${s*.72}" height="${s*.42}" rx="3" fill="${p.c1}"/><rect x="${s*.14}" y="${s*.3}" width="${s*.72}" height="${s*.14}" rx="2" fill="${p.c2}"/>`,
+    newspaper:`<rect x="4" y="${s*.1}" width="${s-8}" height="${s*.8}" rx="1" fill="${p.c1}"/><rect x="6" y="${s*.14}" width="${s-12}" height="3" fill="#888"/><rect x="6" y="${s*.3}" width="${s-14}" height="2" fill="#bbb"/><rect x="6" y="${s*.42}" width="${s-16}" height="2" fill="#bbb"/><rect x="6" y="${s*.54}" width="${s-18}" height="2" fill="#bbb"/>`,
+    butter:`<rect x="6" y="${s*.22}" width="${s-12}" height="${s*.56}" rx="3" fill="${p.c1}"/><rect x="8" y="${s*.26}" width="${s-16}" height="${s*.12}" rx="1" fill="${p.c2}" opacity=".6"/>`,
+    tea:`<rect x="${s*.16}" y="${s*.14}" width="${s*.68}" height="${s*.72}" rx="3" fill="${p.c1}"/><ellipse cx="${s/2}" cy="${s*.18}" rx="${s*.28}" ry="${s*.08}" fill="${p.c2}"/>`,
+    macaroni:`<ellipse cx="${s/2}" cy="${s/2}" rx="${s/2-3}" ry="${s/2-3}" fill="${p.c1}"/><ellipse cx="${s/2}" cy="${s/2}" rx="${s/2-8}" ry="${s/2-8}" fill="${p.c2}" opacity=".7"/>`,
+  };
+  return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" xmlns="http://www.w3.org/2000/svg">${shapes[p.id]||`<rect x="6" y="6" width="${s-12}" height="${s-12}" rx="4" fill="${p.c1}"/>`}</svg>`;
+}
+
+function svgCustomer(type) {
+  const pal = {
+    granny:{body:'#9b6b9b',hair:'#e0e0e0',skin:'#f4c68a'},
+    man:   {body:'#4a6a9b',hair:'#2a1800',skin:'#f4a86a'},
+    woman: {body:'#c84a7a',hair:'#1a1008',skin:'#f5c09a'},
+    child: {body:'#4a9b5a',hair:'#6a4a2a',skin:'#f5d0a0'},
+    oldman:{body:'#6a6a6a',hair:'#d0d0d0',skin:'#e8a07a'},
+  };
+  const c = pal[type]||pal.man;
+  const hair = {
+    granny:`<ellipse cx="30" cy="14" rx="17" ry="9" fill="${c.hair}"/>`,
+    man:`<rect x="13" y="11" width="34" height="9" rx="4" fill="${c.hair}"/>`,
+    woman:`<ellipse cx="30" cy="13" rx="17" ry="9" fill="${c.hair}"/><rect x="10" y="20" width="6" height="18" rx="3" fill="${c.hair}"/><rect x="44" y="20" width="6" height="18" rx="3" fill="${c.hair}"/>`,
+    child:`<ellipse cx="30" cy="13" rx="17" ry="9" fill="${c.hair}"/>`,
+    oldman:`<ellipse cx="30" cy="15" rx="16" ry="7" fill="${c.hair}" opacity=".7"/>`,
+  };
+  return `<svg width="56" height="115" viewBox="0 0 60 120" xmlns="http://www.w3.org/2000/svg">
+    <rect x="18" y="84" width="10" height="28" rx="4" fill="${c.body}"/>
+    <rect x="32" y="84" width="10" height="28" rx="4" fill="${c.body}"/>
+    <ellipse cx="23" cy="113" rx="7" ry="5" fill="#1a1008"/>
+    <ellipse cx="37" cy="113" rx="7" ry="5" fill="#1a1008"/>
+    <rect x="12" y="48" width="36" height="38" rx="7" fill="${c.body}"/>
+    <rect x="0" y="50" width="14" height="8" rx="4" fill="${c.skin}"/>
+    <rect x="46" y="50" width="14" height="8" rx="4" fill="${c.skin}"/>
+    <circle cx="7" cy="54" r="5" fill="${c.skin}"/>
+    <circle cx="53" cy="54" r="5" fill="${c.skin}"/>
+    <rect x="49" y="51" width="12" height="6" rx="1" fill="#ffe555" opacity=".95"/>
+    <rect x="25" y="38" width="10" height="13" rx="3" fill="${c.skin}"/>
+    <ellipse cx="30" cy="29" rx="17" ry="19" fill="${c.skin}"/>
+    ${hair[type]||hair.man}
+    <circle cx="22" cy="27" r="3" fill="white"/><circle cx="38" cy="27" r="3" fill="white"/>
+    <circle cx="23" cy="27" r="1.8" fill="#111"/><circle cx="39" cy="27" r="1.8" fill="#111"/>
+    <path d="M23 36 Q30 42 37 36" stroke="#5a2a10" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+
+function svgSeller() {
+  return `<svg width="55" height="110" viewBox="0 0 55 110" xmlns="http://www.w3.org/2000/svg">
+    <rect x="16" y="75" width="9" height="28" rx="3" fill="#2a3a5a"/>
+    <rect x="30" y="75" width="9" height="28" rx="3" fill="#2a3a5a"/>
+    <ellipse cx="20" cy="103" rx="6" ry="4" fill="#1a1008"/>
+    <ellipse cx="35" cy="103" rx="6" ry="4" fill="#1a1008"/>
+    <rect x="10" y="42" width="35" height="36" rx="6" fill="#3a5a3a"/>
+    <rect x="2" y="44" width="10" height="8" rx="4" fill="#f4c68a"/>
+    <rect x="43" y="44" width="10" height="8" rx="4" fill="#f4c68a"/>
+    <rect x="23" y="34" width="9" height="12" rx="3" fill="#f4c68a"/>
+    <ellipse cx="27" cy="26" rx="15" ry="17" fill="#f4c68a"/>
+    <rect x="12" y="11" width="30" height="8" rx="4" fill="#2a1808"/>
+    <circle cx="20" cy="24" r="2.5" fill="white"/><circle cx="34" cy="24" r="2.5" fill="white"/>
+    <circle cx="21" cy="24" r="1.5" fill="#111"/><circle cx="35" cy="24" r="1.5" fill="#111"/>
+    <path d="M20 34 Q27 39 34 34" stroke="#5a2a10" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <rect x="14" y="43" width="6" height="3" rx="1" fill="#c8a040" opacity=".8"/>
+  </svg>`;
+}
+
+function svgNewspaper() {
+  return `<svg width="50" height="70" viewBox="0 0 50 70" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2" y="0" width="46" height="62" rx="2" fill="#f5f0e0"/>
+    <rect x="4" y="2" width="42" height="12" rx="1" fill="#2a2a2a"/>
+    <text x="25" y="12" text-anchor="middle" font-size="7" fill="#f5f0e0" font-family="Arial" font-weight="bold">ГАЗЕТА</text>
+    <rect x="4" y="16" width="42" height="2" fill="#888"/>
+    <rect x="4" y="20" width="20" height="30" rx="1" fill="#eee8d0"/>
+    <rect x="26" y="20" width="20" height="14" rx="1" fill="#ddd8c0"/>
+    <rect x="26" y="36" width="20" height="14" rx="1" fill="#e5dfc8"/>
+    <rect x="4" y="52" width="42" height="2" fill="#aaa"/>
+    <rect x="4" y="56" width="30" height="2" fill="#ccc"/>
+    <rect x="2" y="62" width="46" height="8" rx="1" fill="#4a3010"/>
+  </svg>`;
+}
+
+// ---- AUDIO ENGINE ----
+let AC = null;
+let VOL = {m:0.6, s:0.8, n:0.4};
+let bgTimer = null, natTimer = null;
+
+function ac() {
+  if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+  if (AC.state === 'suspended') AC.resume();
+  return AC;
+}
+function tone(f, dur, type, vol, delay) {
+  try {
+    const c = ac();
+    const o = c.createOscillator(), g = c.createGain();
+    o.connect(g); g.connect(c.destination);
+    o.type = type||'triangle';
+    o.frequency.setValueAtTime(f, c.currentTime+(delay||0));
+    g.gain.setValueAtTime(0, c.currentTime+(delay||0));
+    g.gain.linearRampToValueAtTime((vol||0.2)*VOL.s, c.currentTime+(delay||0)+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime+(delay||0)+dur);
+    o.start(c.currentTime+(delay||0));
+    o.stop(c.currentTime+(delay||0)+dur+0.05);
+  } catch(e){}
+}
+function noise(dur, vol, f1, f2) {
+  try {
+    const c = ac();
+    const buf = c.createBuffer(1, c.sampleRate*dur, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1);
+    const src = c.createBufferSource(); src.buffer = buf;
+    const flt = c.createBiquadFilter(); flt.type='bandpass';
+    flt.frequency.value = (f1+f2)/2; flt.Q.value=1;
+    const g = c.createGain();
+    g.gain.setValueAtTime(vol*VOL.s, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime+dur);
+    src.connect(flt); flt.connect(g); g.connect(c.destination);
+    src.start(); src.stop(c.currentTime+dur+0.05);
+  } catch(e){}
+}
+
+// Music: gentle 80s-ish melody
+const MELODY = [
+  [523,0.3],[587,0.3],[659,0.25],[698,0.25],
+  [784,0.4],[698,0.2],[659,0.3],[587,0.25],
+  [523,0.4],[440,0.35],[494,0.3],[523,0.3],
+  [587,0.6],[0,0.3],
+  [392,0.3],[440,0.3],[494,0.3],[523,0.35],
+  [587,0.45],[523,0.2],[494,0.3],[440,0.25],
+  [392,0.5],[349,0.3],[392,0.3],[440,0.3],
+  [523,0.7],[0,0.4],
+];
+function playMelody() {
+  if (VOL.m <= 0) return 0;
+  let t = 0;
+  MELODY.forEach(([f,d]) => {
+    if(f>0) tone(f, d*0.75, 'triangle', 0.10*VOL.m, t);
+    if(f>0 && Math.random()>0.5) tone(f*0.5, d*0.7, 'sine', 0.04*VOL.m, t+0.01);
+    t += d;
+  });
+  return t;
+}
+function startBg() {
+  if (bgTimer) clearInterval(bgTimer);
+  const dur = playMelody();
+  if (dur > 0) bgTimer = setInterval(playMelody, (dur+0.3)*1000);
+}
+function stopBg() { if(bgTimer){clearInterval(bgTimer);bgTimer=null;} }
+
+// Nature sounds
+function chirp() {
+  if(VOL.n<=0) return;
+  const b = 700+Math.random()*500;
+  [0,0.12,0.24].forEach(d => {
+    tone(b+Math.random()*80, 0.07, 'sine', 0.12*VOL.n, d);
+    tone(b*1.4+Math.random()*40, 0.05, 'sine', 0.08*VOL.n, d+0.03);
+  });
+}
+function water() {
+  if(VOL.n<=0) return;
+  noise(0.4, 0.06*VOL.n, 600, 1200);
+}
+function startNat() {
+  if(natTimer) clearInterval(natTimer);
+  natTimer = setInterval(() => {
+    if(Math.random()<0.65) chirp();
+    if(Math.random()<0.3) water();
+  }, 2000+Math.random()*3500);
+}
+function stopNat() { if(natTimer){clearInterval(natTimer);natTimer=null;} }
+
+// SFX shortcuts
+function sfxCoin(){ [1200,1500,1800].forEach((f,i)=>tone(f,0.1,'sine',0.18,i*0.05)); }
+function sfxErr(){ [200,175,150].forEach((f,i)=>tone(f,0.15,'square',0.15,i*0.08)); }
+function sfxOk(){ [523,659,784,1047].forEach((f,i)=>tone(f,0.1,'triangle',0.18,i*0.07)); }
+function sfxClick(){ tone(600,0.04,'square',0.08); }
+function sfxArrive(){ tone(440,0.18,'triangle',0.12); tone(550,0.18,'triangle',0.12,0.1); }
+function sfxPaper(){ noise(0.2,0.4,1000,3000); }
+
+// TTS
+function speak(text, ct) {
+  try {
+    if(!window.speechSynthesis) return;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ru-RU';
+    u.volume = Math.min(1, VOL.s*1.1);
+    u.pitch = ct.pitch||1;
+    u.rate = ct.rate||1;
+    const vv = speechSynthesis.getVoices().filter(v=>v.lang&&v.lang.startsWith('ru'));
+    if(vv.length) u.voice = (ct.pitch<1 && vv.length>1) ? vv[1] : vv[0];
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  } catch(e){}
+}
+
+// ---- GAME STATE ----
+let G = {
+  money:0, score:0, day:1, served:0,
+  timeMin: 8*60,
+  cur: null, selProd:null,
+  dayOver:false,
+  stock:{},
+  cfg:{m:60,s:80,n:40,sp:1}
+};
+let clockIv = null, spawnTimeout = null;
+
+function initStock() {
+  G.stock = {};
+  PRODS.forEach(p => G.stock[p.id] = 5+Math.floor(Math.random()*8));
+}
+
+// ---- BUILD UI ----
+function buildTrees() {
+  const wrap = document.getElementById('mtrees');
+  wrap.innerHTML = '';
+  [4,10,17,23,30,37,44,51,57,64,71,78,85,92].forEach(pct => {
+    const sc = 0.6+Math.random()*0.7;
+    const d = document.createElement('div');
+    d.className = 'mtree-wrap';
+    d.style.cssText = `left:${pct}%;transform:scale(${sc});transform-origin:bottom center`;
+    d.innerHTML = `<svg width="44" height="68" viewBox="0 0 44 68" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="22,0 38,22 32,22 42,40 34,40 44,60 0,60 10,40 2,40 12,22 6,22" fill="#3a7a3d"/>
+      <polygon points="22,4 36,24 30,24 40,42 32,42 42,60 2,60 12,42 4,42 14,24 8,24" fill="#4a8a4d"/>
+      <rect x="18" y="60" width="8" height="8" rx="2" fill="#5c3d1e"/>
+    </svg>`;
+    wrap.appendChild(d);
+  });
+}
+
+function buildMountains() {
+  const w = document.getElementById('mmtns');
+  w.innerHTML = `
+    <div class="mmt" style="border-width:0 110px 170px 110px;border-bottom-color:#1e4a62;left:3%"></div>
+    <div class="mmt" style="border-width:0 150px 230px 150px;border-bottom-color:#163852;left:18%"></div>
+    <div class="mmt" style="border-width:0 95px 150px 95px;border-bottom-color:#1e4a62;left:43%"></div>
+    <div class="mmt" style="border-width:0 130px 200px 130px;border-bottom-color:#163852;left:58%"></div>
+    <div class="mmt" style="border-width:0 85px 135px 85px;border-bottom-color:#1e4a62;right:3%"></div>`;
+}
+
+function buildBirds() {
+  const w = document.getElementById('mbirds');
+  w.innerHTML = '';
+  [[18,12,0],[15,15,6],[21,18,3]].forEach(([t,d,del],i) => {
+    const b = document.createElement('div');
+    b.className = 'mbird';
+    b.style.cssText = `top:${t}%;animation-duration:${d}s;animation-delay:${del}s`;
+    b.innerHTML = `<svg width="22" height="8" viewBox="0 0 22 8"><path d="M0,6 Q5,0 11,4 Q17,0 22,6" fill="none" stroke="#333" stroke-width="1.5"/></svg>`;
+    w.appendChild(b);
+  });
+}
+
+function buildNewspaperRack() {
+  const el = document.getElementById('nprack');
+  el.innerHTML = `<div style="background:#5c3d1e;border:2px solid #3a2010;border-radius:3px 3px 0 0;padding:4px;width:52px">
+    ${[0,4,-2].map(off=>`<div style="margin-left:${off}px;margin-bottom:2px">${svgNewspaper()}</div>`).join('')}
+  </div>
+  <div style="background:linear-gradient(180deg,#5c3d1e,#3a2010);border:2px solid #3a2010;border-top:none;height:16px;width:52px;border-radius:0 0 3px 3px"></div>`;
+}
+
+function buildShelves() {
+  const area = document.getElementById('shelves');
+  area.innerHTML = '';
+  const rows = [
+    ['bread','milk','sugar','salt','butter'],
+    ['matches','canned','vodka','cigarettes','tea'],
+    ['macaroni','newspaper','bread','milk','sugar'],
+  ];
+  rows.forEach(row => {
+    const shelf = document.createElement('div');
+    shelf.className = 'g-shelf';
+    row.forEach(id => {
+      const p = PRODS.find(x=>x.id===id); if(!p) return;
+      const item = document.createElement('div');
+      item.className = 'pitem';
+      item.id = 'pi_'+id+'_'+Math.random().toString(36).slice(2,5);
+      item.dataset.pid = id;
+      item.innerHTML = `<div class="ptip">${p.name} — ${p.price.toFixed(2)}₴</div>${svgProd(p,44)}`;
+      item.addEventListener('click', ()=>pickProd(id));
+      shelf.appendChild(item);
+    });
+    area.appendChild(shelf);
+  });
+}
+
+function buildCalc() {
+  const g = document.getElementById('cg');
+  g.innerHTML = '';
+  [['7','8','9','÷'],['4','5','6','×'],['1','2','3','-'],['C','0','=','+']].forEach(row => {
+    row.forEach(k => {
+      const b = document.createElement('button');
+      b.className = 'cbtn'+('÷×-+'.includes(k)?' op':'')+(k==='='?' eq':'')+(k==='C'?' cl':'');
+      b.textContent = k;
+      b.addEventListener('click', ()=>calcKey(k));
+      g.appendChild(b);
+    });
+  });
+}
+
+function buildDust() {
+  const c = document.getElementById('dust');
+  c.innerHTML = '';
+  for(let i=0;i<10;i++){
+    const d=document.createElement('div');
+    d.className='dp';
+    d.style.cssText=`left:${Math.random()*100}%;bottom:${Math.random()*55}%;animation-duration:${4+Math.random()*9}s;animation-delay:${Math.random()*10}s`;
+    c.appendChild(d);
+  }
+}
+
+// ---- CALCULATOR ----
+let cBuf='0', cOp='', cPrev=0, cFresh=false;
+function calcKey(k) {
+  sfxClick();
+  const d = document.getElementById('cd');
+  if(k==='C'){cBuf='0';cOp='';cPrev=0;cFresh=false;}
+  else if('0123456789.'.includes(k)){
+    if(cFresh){cBuf=k;cFresh=false;}
+    else{if(cBuf==='0'&&k!=='.')cBuf=k;else if(cBuf.length<10)cBuf+=k;}
+  }
+  else if('÷×-+'.includes(k)){cPrev=parseFloat(cBuf)||0;cOp=k;cFresh=true;}
+  else if(k==='='){
+    const cur=parseFloat(cBuf)||0;
+    let r=cPrev;
+    if(cOp==='÷')r=cur!==0?cPrev/cur:0;
+    else if(cOp==='×')r=cPrev*cur;
+    else if(cOp==='-')r=cPrev-cur;
+    else if(cOp==='+')r=cPrev+cur;
+    else r=cur;
+    cBuf=parseFloat(r.toFixed(6)).toString();
+    if(cBuf.length>9)cBuf=parseFloat(r).toFixed(2);
+    cOp='';cFresh=true;
+  }
+  d.textContent=cBuf;
+}
+
+// ---- CUSTOMER SYSTEM ----
+function makeCustomer() {
+  const avail = PRODS.filter(p=>G.stock[p.id]>0);
+  if(!avail.length) return null;
+  const ct = CTYPES[Math.floor(Math.random()*CTYPES.length)];
+  const p = avail[Math.floor(Math.random()*avail.length)];
+  const extras = [0,0.05,0.10,0.20,0.50,1.00,2.00,5.00];
+  let money = p.price + extras[Math.floor(Math.random()*extras.length)];
+  money = Math.max(p.price, parseFloat(money.toFixed(2)));
+  const phr = PHRASES[ct.id];
+  const txt = phr[Math.floor(Math.random()*phr.length)]
+    .replace('{p}', p.name)
+    .replace('{m}', money.toFixed(2));
+  return { ct, p, money, change: parseFloat((money-p.price).toFixed(2)), txt };
+}
+
+function spawnCust() {
+  if(G.dayOver) return;
+  const c = makeCustomer();
+  if(!c){ notify('Товары закончились! Магазин закрывается.','err'); setTimeout(endDay,2000); return; }
+  G.cur = c; G.selProd = null;
+  const fig = document.getElementById('cust');
+  fig.innerHTML = svgCustomer(c.ct.id);
+  fig.className = 'g-cust vis';
+  const bub = document.getElementById('bubble');
+  bub.innerHTML = c.txt;
+  bub.className = 'g-bubble vis';
+  speak(c.txt, c.ct);
+  sfxArrive();
+  document.getElementById('txP').innerHTML = `<span class="req">${c.p.name}</span>`;
+  document.getElementById('txPr').textContent = c.p.price.toFixed(2)+'₴';
+  document.getElementById('txR').textContent = c.money.toFixed(2)+'₴';
+  document.getElementById('txC').textContent = c.change.toFixed(2)+'₴';
+  document.getElementById('btnGive').disabled = true;
+  highlightProds(null); // clear
+}
+
+function pickProd(id) {
+  if(!G.cur) return;
+  sfxClick();
+  G.selProd = id;
+  highlightProds(id);
+  const isOk = id === G.cur.p.id;
+  const pp = PRODS.find(x=>x.id===id);
+  document.getElementById('btnGive').disabled = false;
+  if(isOk) notify(`✓ Верно! ${pp.name} — ${pp.price.toFixed(2)}₴`,'ok');
+  else notify(`Выбрано: ${pp.name}, но просили ${G.cur.p.name}`,'err');
+}
+
+function highlightProds(selId) {
+  document.querySelectorAll('.pitem').forEach(el => {
+    el.classList.remove('sel');
+    if(selId && el.dataset.pid === selId) el.classList.add('sel');
+  });
+}
+
+function giveP() {
+  if(!G.cur||!G.selProd) return;
+  const c = G.cur;
+  if(G.selProd !== c.p.id){
+    sfxErr(); notify(`Неверный товар! Нужен: ${c.p.name}`,'err');
+    G.score = Math.max(0, G.score-10); updateHUD(); return;
+  }
+  sfxCoin(); sfxOk();
+  G.money = parseFloat((G.money + c.p.price).toFixed(2));
+  G.score += 10 + (c.change===0?5:0);
+  G.served++;
+  G.stock[c.p.id]--;
+  showRcpt(c);
+  clearCust(); updateHUD(); highlightProds(null);
+  save();
+  spawnTimeout = setTimeout(()=>{ if(!G.dayOver) spawnCust(); }, 2800+Math.random()*2000);
+}
+
+function skipC() {
+  if(!G.cur) return;
+  sfxErr(); notify('Клиент ушёл недовольный!','err');
+  G.score = Math.max(0, G.score-5);
+  clearCust(); updateHUD();
+  spawnTimeout = setTimeout(()=>{ if(!G.dayOver) spawnCust(); }, 2000+Math.random()*1500);
+}
+
+function clearCust() {
+  G.cur=null; G.selProd=null;
+  document.getElementById('cust').className='g-cust';
+  document.getElementById('bubble').className='g-bubble';
+  ['txP','txPr','txR','txC'].forEach(id=>document.getElementById(id).textContent='—');
+  document.getElementById('btnGive').disabled=true;
+  highlightProds(null);
+}
+
+// ---- HUD ----
+function updateHUD() {
+  document.getElementById('hm').textContent='₴'+G.money.toFixed(2);
+  document.getElementById('hs').textContent=G.score;
+  document.getElementById('hc').textContent=G.served;
+  const h=Math.floor(G.timeMin/60), m=G.timeMin%60;
+  document.getElementById('ht').textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+}
+
+// ---- CLOCK ----
+function startClock() {
+  if(clockIv) clearInterval(clockIv);
+  const sp = G.cfg.sp||1;
+  clockIv = setInterval(()=>{
+    G.timeMin++;
+    if(G.timeMin >= 21*60){ clearInterval(clockIv); clockIv=null; endDay(); return; }
+    updateHUD();
+    // day/night overlay
+    const t=G.timeMin, ov=document.getElementById('dn');
+    let a=0;
+    if(t<8*60) a=0.65;
+    else if(t<9*60) a=0.65-(t-8*60)/60*0.65;
+    else if(t<17*60) a=0;
+    else if(t<20*60) a=(t-17*60)/(3*60)*0.45;
+    else a=0.45;
+    ov.style.background=`rgba(0,5,20,${a})`;
+  }, Math.round(2800/sp));
+}
+
+// ---- END DAY ----
+function endDay() {
+  if(G.dayOver) return;
+  G.dayOver=true;
+  stopBg(); if(spawnTimeout) clearTimeout(spawnTimeout);
+  document.getElementById('bigT').textContent=`ДЕНЬ ${G.day} ЗАКОНЧЕН!`;
+  document.getElementById('bigS').innerHTML=
+    `Обслужено клиентов: <b>${G.served}</b><br>`+
+    `Заработано: <b>₴${G.money.toFixed(2)}</b><br>`+
+    `Очки: <b>${G.score}</b>`;
+  document.getElementById('bigMsg').className='g-big on';
+  sfxOk(); setTimeout(sfxOk,400);
+}
+
+function nextDay() {
+  G.day++; G.timeMin=8*60; G.dayOver=false; G.cur=null;
+  initStock(); buildShelves();
+  document.getElementById('bigMsg').className='g-big';
+  startClock(); startBg(); spawnCust();
+}
+
+// ---- RECEIPT ----
+let rcptTimer=null;
+function showRcpt(c) {
+  sfxPaper();
+  const h=Math.floor(G.timeMin/60), m=G.timeMin%60;
+  document.getElementById('rcptBody').innerHTML=`
+    <div style="font-size:10px;color:#888;text-align:center;margin-bottom:6px">ДЕНЬ ${G.day} · ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}</div>
+    <div class="rcpt-ln"><span>${c.p.name}</span><span>${c.p.price.toFixed(2)}₴</span></div>
+    <div class="rcpt-ln" style="color:#888;font-size:11px"><span>Получено</span><span>${c.money.toFixed(2)}₴</span></div>
+    <div class="rcpt-tot"><span>СДАЧА</span><span>${c.change.toFixed(2)}₴</span></div>
+    <div style="text-align:center;margin-top:7px;font-size:10px;color:#888">СПАСИБО ЗА ПОКУПКУ!</div>`;
+  document.getElementById('rcpt').className='g-receipt on';
+  if(rcptTimer) clearTimeout(rcptTimer);
+  rcptTimer = setTimeout(closeRcpt, 2600);
+}
+function closeRcpt(){ document.getElementById('rcpt').className='g-receipt'; }
+
+// ---- NOTIFICATION ----
+let nTimer=null;
+function notify(txt, type) {
+  const el=document.getElementById('notif');
+  el.textContent=txt;
+  el.className='g-notif on'+(type?' '+type:'');
+  if(nTimer) clearTimeout(nTimer);
+  nTimer=setTimeout(()=>el.className='g-notif',2400);
+}
+
+// ---- SAVE / LOAD ----
+function save() {
+  try{ localStorage.setItem('mshop',JSON.stringify({money:G.money,score:G.score,day:G.day,served:G.served,cfg:G.cfg})); }catch(e){}
+}
+function loadSaved() {
+  try{ const s=localStorage.getItem('mshop'); return s?JSON.parse(s):null; }catch(e){return null;}
+}
+
+// ---- SCREENS ----
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startNew() {
+  sfxClick(); ac();
+  G={money:0,score:0,day:1,served:0,timeMin:8*60,cur:null,selProd:null,dayOver:false,stock:{},cfg:G.cfg||{m:60,s:80,n:40,sp:1}};
+  launchGame();
+}
+
+function loadContinue() {
+  sfxClick(); ac();
+  const sv=loadSaved();
+  if(!sv){startNew();return;}
+  G.money=sv.money||0; G.score=sv.score||0; G.day=sv.day||1; G.served=sv.served||0;
+  G.cfg=sv.cfg||{m:60,s:80,n:40,sp:1};
+  G.timeMin=8*60; G.dayOver=false; G.cur=null; G.selProd=null; G.stock={};
+  launchGame();
+}
+
+function launchGame() {
+  stopNat();
+  initStock(); buildShelves(); buildCalc(); buildDust();
+  document.getElementById('seller').innerHTML = svgSeller();
+  updateHUD();
+  showScreen('gs');
+  setTimeout(()=>{ startBg(); startNat(); startClock(); spawnCust(); }, 400);
+}
+
+function toMenu() {
+  sfxClick(); stopBg();
+  if(clockIv){clearInterval(clockIv);clockIv=null;}
+  if(spawnTimeout){clearTimeout(spawnTimeout);spawnTimeout=null;}
+  save();
+  showScreen('ms');
+  startNat();
+  const sv=loadSaved();
+  document.getElementById('contBtn').style.display=sv?'block':'none';
+}
+
+// ---- SETTINGS ----
+function openSet(){ sfxClick(); document.getElementById('setMod').classList.add('on'); document.getElementById('slM').value=G.cfg.m; document.getElementById('slS').value=G.cfg.s; document.getElementById('slN').value=G.cfg.n; document.getElementById('slSp').value=G.cfg.sp; }
+function closeSet(){
+  sfxClick();
+  G.cfg.m=+document.getElementById('slM').value;
+  G.cfg.s=+document.getElementById('slS').value;
+  G.cfg.n=+document.getElementById('slN').value;
+  G.cfg.sp=+document.getElementById('slSp').value;
+  VOL.m=G.cfg.m/100; VOL.s=G.cfg.s/100; VOL.n=G.cfg.n/100;
+  save(); document.getElementById('setMod').classList.remove('on');
+}
+function sV(k,v){ if(k==='m')VOL.m=v/100; else if(k==='s')VOL.s=v/100; else if(k==='n')VOL.n=v/100; }
+
+// ---- DONATE ----
+function openDon(){ sfxClick(); document.getElementById('donMod').classList.add('on'); }
+function closeDon(){ sfxClick(); document.getElementById('donMod').classList.remove('on'); }
+function copyCard(){
+  navigator.clipboard.writeText('4874070024955450').then(()=>notify('Номер скопирован! Спасибо ❤️','ok')).catch(()=>notify('4874 0700 2495 5450',''));
+  sfxOk();
+}
+
+// Close modals on outside click
+document.querySelectorAll('.moverlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on');}));
+
+// ---- LOADING SEQUENCE ----
+const TIPS = ['РАССТАВЛЯЕМ ТОВАРЫ...','ЗАЗЫВАЕМ ПОКУПАТЕЛЕЙ...','НАСТРАИВАЕМ КАССУ...','ТОЧИМ КАРАНДАШИ...','ОТКРЫВАЕМ МАГАЗИН...'];
+let ldStep = 0;
+const ldBar = document.getElementById('ldBar');
+const ldTip = document.getElementById('ldTip');
+
+function doLoad() {
+  ldStep++;
+  const pct = ldStep * 20;
+  ldBar.style.width = pct + '%';
+  ldTip.textContent = TIPS[Math.min(ldStep-1, TIPS.length-1)];
+  if(ldStep < 5) {
+    setTimeout(doLoad, 300 + Math.random()*200);
+  } else {
+    // Done — go to menu
+    setTimeout(()=>{
+      buildTrees(); buildMountains(); buildBirds(); buildNewspaperRack();
+      const sv = loadSaved();
+      document.getElementById('contBtn').style.display = sv ? 'block' : 'none';
+      if(sv && sv.cfg){ G.cfg=sv.cfg; VOL.m=sv.cfg.m/100; VOL.s=sv.cfg.s/100; VOL.n=sv.cfg.n/100; }
+      showScreen('ms');
+      // Unlock audio on first interaction
+      document.addEventListener('click', ()=>{ if(!AC){ ac(); startNat(); startBg(); } }, {once:true});
+      document.addEventListener('touchstart', ()=>{ if(!AC){ ac(); startNat(); startBg(); } }, {once:true});
+    }, 300);
+  }
+}
+
+// Start loading when DOM is ready (no waiting on external resources)
+window.addEventListener('DOMContentLoaded', ()=>{
+  setTimeout(doLoad, 200);
+});
+
+// Preload speech voices
+if(window.speechSynthesis) {
+  speechSynthesis.getVoices();
+  speechSynthesis.onvoiceschanged = ()=> speechSynthesis.getVoices();
+}
+</script>
+</body>
+</html>
