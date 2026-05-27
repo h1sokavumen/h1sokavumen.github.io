@@ -370,9 +370,19 @@ function newGame() {
 function continueGame() {
   const saved = JSON.parse(localStorage.getItem('maloshko_save'));
   if (saved) { 
-    G = saved; 
+    // Умное слияние старого сейва с новыми переменными
+    G = { ...G, ...saved };
     if(!G.upgrades) G.upgrades = { fridge: false, neon: false, alarm: false, won: false };
     if(!G.workers) G.workers = { t1: 0, t2: 0, t3: 0 };
+    if(!G.np_parcels) G.np_parcels = [];
+    if(!G.deliveries) G.deliveries = [];
+    if(!G.debts) G.debts = [];
+    if(!G.stock) G.stock = {};
+    
+    // Восстанавливаем товары, если их не было в старом сейве
+    PRODS_BASIC.forEach(p => { if(G.stock[p.id] === undefined) G.stock[p.id] = 10; });
+    PRODS_PREMIUM.forEach(p => { if(G.stock[p.id] === undefined) G.stock[p.id] = 0; });
+
     startGame(); 
   }
 }
@@ -494,6 +504,11 @@ function spawnCustomer() {
   } 
   else {
     const prods = getActiveProds();
+    if(prods.length === 0) {
+        // Если вообще нет товаров в базе (не должно быть, но на всякий случай)
+        scheduleNextCustomer();
+        return;
+    }
     const prod = prods[Math.floor(Math.random() * prods.length)];
     let qty = Math.floor(Math.pow(Math.random(), 2) * 9) + 1; 
     const totalCost = parseFloat((prod.price * qty).toFixed(2));
@@ -670,7 +685,6 @@ function showFloatingIncome(amount) {
 function tickTime() {
   G.time++; 
   
-  // Пассивный доход
   let passive = (G.workers.t1 * STAFF_TIERS.t1.income) + (G.workers.t2 * STAFF_TIERS.t2.income) + (G.workers.t3 * STAFF_TIERS.t3.income);
   if (passive > 0) {
     G.money += passive;
