@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Maloshko Shop - Ultimate</title>
+<title>Maloshko Shop - Idle Tycoon</title>
 <style>
 /* === БАЗОВЫЕ СТИЛИ === */
 :root {
@@ -37,11 +37,12 @@ body { background-color: var(--bg-dark); color: var(--text-main); font-family: v
 .hud-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
 .hud-value { font-size: 16px; font-weight: bold; color: var(--gold); font-family: monospace; }
 .hud-value.green { color: var(--accent-green); }
-.hud-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;}
-.btn-hud { background: var(--wood-light); border: 1px solid var(--gold); color: var(--text-main); padding: 6px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s;}
+.hud-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;}
+.btn-hud { background: var(--wood-light); border: 1px solid var(--gold); color: var(--text-main); padding: 6px 8px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s;}
 .btn-hud:hover { background: var(--gold); color: #000; }
 .btn-np { background: var(--np-red); border-color: #fff; color: #fff; }
 .btn-upg { background: #673ab7; border-color: #d1c4e9; color: #fff; }
+.btn-staff { background: #ff9800; border-color: #fff; color: #fff; }
 
 /* Игровая зона */
 .game-area { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
@@ -74,13 +75,17 @@ body { background-color: var(--bg-dark); color: var(--text-main); font-family: v
 .seller-name { font-size: 10px; background: rgba(0,0,0,0.7); padding: 2px 5px; border-radius: 3px; margin-top: 5px; color: var(--gold); }
 
 /* Покупатель */
-.customer { position: absolute; bottom: 10px; left: 15%; z-index: 6; transition: opacity 0.3s; opacity: 0; pointer-events: none; }
+.customer { position: absolute; bottom: 10px; left: 15%; z-index: 6; transition: opacity 0.3s; opacity: 0; pointer-events: auto; cursor: pointer; }
 .customer.visible { opacity: 1; animation: slideUp 0.4s ease-out; }
 @keyframes slideUp { from { transform: translate(-50%, 50px); opacity: 0; } to { transform: translate(0, 0); opacity: 1; } }
 
 /* Анимация разговора */
 @keyframes talkShake { 0% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-3px) rotate(-2deg); } 50% { transform: translateY(0) rotate(2deg); } 75% { transform: translateY(-3px) rotate(-1deg); } 100% { transform: translateY(0) rotate(0deg); } }
 .talking { animation: talkShake 0.3s infinite; }
+
+/* Всплывающий пассивный доход */
+.floating-income { position: absolute; bottom: 80px; right: 30%; color: var(--accent-green); font-weight: bold; font-size: 18px; pointer-events: none; animation: floatUp 1.5s ease-out forwards; z-index: 50; text-shadow: 0 0 5px #000; }
+@keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-60px); opacity: 0; } }
 
 /* Диалоги */
 .bubble { position: absolute; bottom: 100%; background: var(--text-main); color: #000; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.5); width: max-content; max-width: 200px; text-align: center; margin-bottom: 10px; opacity: 0; transition: 0.2s; z-index: 10;}
@@ -89,6 +94,8 @@ body { background-color: var(--bg-dark); color: var(--text-main); font-family: v
 .bubble-cust::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border-width: 8px; border-style: solid; border-color: var(--text-main) transparent transparent transparent; }
 .bubble-seller { right: 50%; transform: translateX(50%); background: #e3f2fd; }
 .bubble-seller::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border-width: 8px; border-style: solid; border-color: #e3f2fd transparent transparent transparent; }
+
+.customer:hover .bubble-cust { opacity: 1; z-index: 100; }
 
 /* Касса (Нижняя панель) */
 .register-panel { background: rgba(20, 15, 10, 0.98); border-top: 2px solid var(--gold-dim); padding: 10px 15px; width: 100%; flex-shrink: 0; z-index: 20; box-shadow: 0 -5px 20px rgba(0,0,0,0.8); }
@@ -149,7 +156,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); font-family: v
 <!-- ГЛАВНОЕ МЕНЮ -->
 <div id="main-menu" class="screen active">
   <div class="logo" id="main-logo">МАГАЗИН<br>МАЛОШКО</div>
-  <div class="subtitle">Ultimate Edition</div>
+  <div class="subtitle">Idle Tycoon Edition</div>
   <div class="menu-btns">
     <button class="btn-menu" id="btn-continue" onclick="continueGame()" style="display:none">ПРОДОЛЖИТЬ</button>
     <button class="btn-menu" onclick="newGame()">НОВАЯ ИГРА</button>
@@ -160,10 +167,11 @@ body { background-color: var(--bg-dark); color: var(--text-main); font-family: v
 <div id="game-screen" class="screen">
   <div class="hud">
     <div class="hud-item"><span class="hud-label">Касса</span><span class="hud-value" id="ui-money">0.00 ₴</span></div>
-    <div class="hud-item"><span class="hud-label">Репутация</span><span class="hud-value green" id="ui-score">0</span></div>
+    <div class="hud-item"><span class="hud-label">Пассив</span><span class="hud-value green" id="ui-passive">+0.00 ₴/с</span></div>
     <div class="hud-item"><span class="hud-label">Время</span><span class="hud-value" id="ui-time">Д1 08:00</span></div>
     <div class="hud-btns">
       <button class="btn-hud" onclick="toggleMusic()" id="btn-music">🎵 Выкл</button>
+      <button class="btn-hud btn-staff" onclick="openStaff()">👨‍💼 Персонал</button>
       <button class="btn-hud btn-upg" onclick="openUpgrades()">🛠 Улучшения</button>
       <button class="btn-hud btn-np" onclick="openNP()">📦 Склад НП</button>
       <button class="btn-hud" onclick="openWholesale()">🛒 Заказ</button>
@@ -177,7 +185,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); font-family: v
     <div class="shelves-container" id="shelves"></div>
     
     <div class="right-panel">
-      <div class="counter-area">
+      <div class="counter-area" id="counter-area">
         <!-- Продавец -->
         <div class="seller" id="seller">
           <div class="bubble bubble-seller" id="bubble-seller">Слушаю вас!</div>
@@ -221,6 +229,15 @@ body { background-color: var(--bg-dark); color: var(--text-main); font-family: v
 </div>
 
 <!-- МОДАЛКИ -->
+<div class="modal-overlay" id="modal-staff">
+  <div class="modal">
+    <div class="modal-title" style="color:#ff9800">НАЙМ ПЕРСОНАЛА</div>
+    <div style="text-align:center; margin-bottom:10px; font-size:12px; color:var(--text-muted)">Сотрудники приносят пассивный доход каждую секунду.</div>
+    <div class="scroll-list" id="staff-list"></div>
+    <button class="btn-close" onclick="closeModal('modal-staff')">ЗАКРЫТЬ</button>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-upgrades">
   <div class="modal">
     <div class="modal-title" style="color:#673ab7">УЛУЧШЕНИЯ МАГАЗИНА</div>
@@ -315,10 +332,17 @@ const CUSTOMERS = [
   { type: 'child', names: ['Вовка', 'Маша'], color: '#457b9d' }
 ];
 
+const STAFF_TIERS = {
+  t1: { name: 'Стажер', cost: 1, income: 0.20, max: 3 },
+  t2: { name: 'Опытный кассир', cost: 100, income: 60, max: 3 },
+  t3: { name: 'Топ-менеджер', cost: 60000, income: 2000000, max: 3 }
+};
+
 // === СОСТОЯНИЕ ИГРЫ ===
 let G = { 
   money: 20.00, score: 0, day: 1, time: 8 * 60, stock: {}, debts: [], deliveries: [], np_parcels: [],
-  upgrades: { fridge: false, neon: false, alarm: false, won: false }
+  upgrades: { fridge: false, neon: false, alarm: false, won: false },
+  workers: { t1: 0, t2: 0, t3: 0 }
 };
 let clockInterval, customerTimeout;
 let currentCustomer = null;
@@ -338,7 +362,7 @@ function toggleMusic() {
 }
 
 function newGame() {
-  G = { money: 20.00, score: 0, day: 1, time: 8 * 60, stock: {}, debts: [], deliveries: [], np_parcels: [], upgrades: { fridge: false, neon: false, alarm: false, won: false } };
+  G = { money: 20.00, score: 0, day: 1, time: 8 * 60, stock: {}, debts: [], deliveries: [], np_parcels: [], upgrades: { fridge: false, neon: false, alarm: false, won: false }, workers: { t1: 0, t2: 0, t3: 0 } };
   PRODS_BASIC.forEach(p => G.stock[p.id] = 10);
   startGame();
 }
@@ -348,6 +372,7 @@ function continueGame() {
   if (saved) { 
     G = saved; 
     if(!G.upgrades) G.upgrades = { fridge: false, neon: false, alarm: false, won: false };
+    if(!G.workers) G.workers = { t1: 0, t2: 0, t3: 0 };
     startGame(); 
   }
 }
@@ -387,6 +412,9 @@ function updateHUD() {
   document.getElementById('ui-score').textContent = G.score;
   let h = Math.floor(G.time / 60), m = G.time % 60;
   document.getElementById('ui-time').textContent = `Д${G.day} ${(h<10?'0'+h:h)}:${(m<10?'0'+m:m)}`;
+  
+  let passive = (G.workers.t1 * STAFF_TIERS.t1.income) + (G.workers.t2 * STAFF_TIERS.t2.income) + (G.workers.t3 * STAFF_TIERS.t3.income);
+  document.getElementById('ui-passive').textContent = `+${passive.toFixed(2)} ₴/с`;
 }
 
 function renderShelves() {
@@ -497,7 +525,6 @@ function setupRegisterUI(req, price, given, change, mode) {
   const resRow = document.getElementById('reg-result-row');
   const resVal = document.getElementById('reg-change');
   
-  // Сброс кнопок
   ['btn-give', 'btn-refuse', 'btn-debt', 'btn-accept-debt', 'btn-out-of-stock'].forEach(id => {
     let el = document.getElementById(id);
     el.style.display = 'none';
@@ -631,9 +658,26 @@ function confirmSignature() {
   finishTransaction("Посылка выдана. Спасибо, что пользуетесь Новой Почтой!");
 }
 
-// === ВРЕМЯ, НАЛОГИ И КОНЕЦ ДНЯ ===
+// === ПАССИВНЫЙ ДОХОД И ВРЕМЯ ===
+function showFloatingIncome(amount) {
+  const el = document.createElement('div');
+  el.className = 'floating-income';
+  el.textContent = `+${amount.toFixed(2)} ₴`;
+  document.getElementById('counter-area').appendChild(el);
+  setTimeout(() => el.remove(), 1500);
+}
+
 function tickTime() {
-  G.time++; updateHUD();
+  G.time++; 
+  
+  // Пассивный доход
+  let passive = (G.workers.t1 * STAFF_TIERS.t1.income) + (G.workers.t2 * STAFF_TIERS.t2.income) + (G.workers.t3 * STAFF_TIERS.t3.income);
+  if (passive > 0) {
+    G.money += passive;
+    showFloatingIncome(passive);
+  }
+  
+  updateHUD();
   
   for (let i = G.deliveries.length - 1; i >= 0; i--) {
     if (G.time >= G.deliveries[i].time) {
@@ -673,6 +717,30 @@ function endDay() {
 }
 
 function nextDay() { G.day++; G.time = 8 * 60; document.getElementById('modal-endday').classList.remove('active'); startGame(); }
+
+// === ПЕРСОНАЛ ===
+function openStaff() {
+  const list = document.getElementById('staff-list'); list.innerHTML = '';
+  
+  Object.keys(STAFF_TIERS).forEach(key => {
+    const t = STAFF_TIERS[key];
+    const currentCount = G.workers[key];
+    
+    const btn = document.createElement('button'); btn.className = 'btn-action'; 
+    btn.textContent = currentCount >= t.max ? 'МАКСИМУМ' : `Нанять (${t.cost} ₴)`;
+    btn.disabled = currentCount >= t.max || G.money < t.cost;
+    btn.onclick = () => { 
+      G.money -= t.cost; G.workers[key]++; 
+      showToast(`${t.name} нанят!`); updateHUD(); saveGame(); openStaff(); 
+    };
+    
+    const item = document.createElement('div'); item.className = 'list-item';
+    item.innerHTML = `<div><b style="color:var(--accent-blue)">${t.name} (${currentCount}/${t.max})</b><br><span style="font-size:11px; color:var(--accent-green)">Доход: +${t.income} ₴/с</span></div>`;
+    item.appendChild(btn); list.appendChild(item);
+  });
+
+  document.getElementById('modal-staff').classList.add('active');
+}
 
 // === УЛУЧШЕНИЯ ===
 function openUpgrades() {
