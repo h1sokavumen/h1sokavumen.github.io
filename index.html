@@ -1,802 +1,510 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Maloshko SMP</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #0d0b14;
-  --bg2: #13101f;
-  --bg3: #1a1630;
-  --border: rgba(130,90,255,0.2);
-  --border2: rgba(130,90,255,0.45);
-  --purple: #825aff;
-  --purple2: #b48aff;
-  --blue: #4488ff;
-  --blue2: #7bb3ff;
-  --white: #eeeeff;
-  --muted: rgba(220,215,255,0.55);
-  --green: #4ade80;
-  --red: #f87171;
-  --yellow: #fbbf24;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-body { background:var(--bg); color:var(--white); font-family:'Inter',sans-serif; overflow-x:hidden; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>maloshko.fun | Vanilla Minecraft Server</title>
+    <style>
+        /* Базові налаштування — Максимально чорна тема */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-/* ─── PIXEL GRID BG ─── */
-body::before {
-  content:'';
-  position:fixed; inset:0; z-index:0;
-  background-image:
-    linear-gradient(rgba(130,90,255,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(130,90,255,0.04) 1px, transparent 1px);
-  background-size: 32px 32px;
-  pointer-events:none;
-}
+        body {
+            background-color: #050506; /* Глибокий вугільний колір */
+            color: #f5f5f7;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 60px;
+        }
 
-/* ─── NAV ─── */
-nav {
-  position:fixed; top:0; left:0; right:0; z-index:200;
-  display:flex; align-items:center; justify-content:space-between;
-  padding:0 2rem;
-  height:54px;
-  background:rgba(13,11,20,0.85);
-  backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);
-}
-.nav-logo {
-  font-family:'Press Start 2P',monospace;
-  font-size:0.7rem;
-  color:var(--purple2);
-  letter-spacing:0.05em;
-  text-decoration:none;
-}
-.nav-links { display:flex; gap:0; list-style:none; }
-.nav-links a {
-  display:block;
-  padding:0 1rem;
-  line-height:54px;
-  color:var(--muted);
-  text-decoration:none;
-  font-size:0.85rem;
-  font-weight:500;
-  transition:color 0.2s;
-  border-left:1px solid var(--border);
-}
-.nav-links a:hover { color:var(--white); }
-.nav-links li:last-child a { border-right:1px solid var(--border); }
-.nav-status {
-  display:flex; align-items:center; gap:0.5rem;
-  font-size:0.78rem; color:var(--muted);
-}
-.dot { width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green); }
+        /* Абсолютно скляні кольорові бліки на фоні */
+        .bg-blur-1 {
+            position: fixed;
+            top: -5%;
+            right: -5%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, rgba(0,0,0,0) 70%);
+            filter: blur(80px);
+            z-index: -1;
+            pointer-events: none;
+        }
 
-/* ─── HERO ─── */
-.hero {
-  position:relative; z-index:1;
-  min-height:100vh;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  align-items:center;
-  gap:2rem;
-  padding:5rem 3rem 3rem;
-  max-width:1200px; margin:0 auto;
-}
-.hero-left { }
-.hero-tag {
-  display:inline-block;
-  font-family:'Press Start 2P',monospace;
-  font-size:0.55rem;
-  color:var(--purple);
-  border:1px solid var(--border2);
-  padding:0.4rem 0.8rem;
-  border-radius:4px;
-  background:rgba(130,90,255,0.08);
-  margin-bottom:1.5rem;
-  letter-spacing:0.05em;
-}
-.hero-title {
-  font-family:'Press Start 2P',monospace;
-  font-size:clamp(1.4rem, 3.5vw, 2.5rem);
-  line-height:1.5;
-  margin-bottom:0.75rem;
-  color:var(--white);
-}
-.hero-title span { color:var(--purple2); }
-.hero-desc {
-  color:var(--muted);
-  font-size:0.95rem;
-  line-height:1.75;
-  max-width:480px;
-  margin-bottom:2rem;
-}
-.hero-ip-row {
-  display:flex; align-items:stretch; gap:0;
-  border:1px solid var(--border2);
-  border-radius:10px;
-  overflow:hidden;
-  background:var(--bg2);
-  margin-bottom:1.25rem;
-  max-width:420px;
-}
-.hero-ip-label {
-  padding:0 1rem;
-  background:rgba(130,90,255,0.12);
-  display:flex; align-items:center;
-  font-family:'Press Start 2P',monospace;
-  font-size:0.5rem;
-  color:var(--purple2);
-  border-right:1px solid var(--border2);
-  white-space:nowrap;
-}
-.hero-ip-addr {
-  flex:1; padding:0 1rem;
-  display:flex; align-items:center;
-  font-family:monospace;
-  font-size:1.15rem;
-  font-weight:700;
-  color:var(--white);
-  letter-spacing:0.03em;
-}
-.copy-btn {
-  padding:0 1rem;
-  border:none;
-  background:var(--purple);
-  color:white;
-  font-size:0.78rem;
-  font-weight:600;
-  cursor:pointer;
-  transition:background 0.2s;
-  font-family:'Inter',sans-serif;
-  white-space:nowrap;
-}
-.copy-btn:hover { background:#9b6fff; }
-.copy-btn.copied { background:var(--green); color:#000; }
+        .bg-blur-2 {
+            position: fixed;
+            bottom: 5%;
+            left: -5%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0,0,0,0) 70%);
+            filter: blur(90px);
+            z-index: -1;
+            pointer-events: none;
+        }
 
-.versions-row { display:flex; gap:0.5rem; flex-wrap:wrap; }
-.vtag {
-  background:rgba(68,136,255,0.1);
-  border:1px solid rgba(68,136,255,0.35);
-  color:var(--blue2);
-  font-size:0.78rem;
-  font-weight:600;
-  padding:0.3rem 0.7rem;
-  border-radius:6px;
-  font-family:monospace;
-}
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-/* ─── HERO RIGHT — FAKE SERVER STATUS CARD ─── */
-.server-card {
-  background:var(--bg2);
-  border:1px solid var(--border2);
-  border-radius:14px;
-  overflow:hidden;
-}
-.server-card-header {
-  display:flex; align-items:center; gap:0.75rem;
-  padding:1rem 1.25rem;
-  border-bottom:1px solid var(--border);
-  background:rgba(130,90,255,0.06);
-}
-.server-icon {
-  width:48px; height:48px;
-  border-radius:8px;
-  background: linear-gradient(135deg, #2a1060, #0a1a60);
-  display:flex; align-items:center; justify-content:center;
-  font-size:1.6rem;
-  flex-shrink:0;
-}
-.server-name { font-weight:700; font-size:1rem; }
-.server-host { font-size:0.8rem; color:var(--muted); margin-top:2px; }
-.server-motd {
-  padding:0.85rem 1.25rem;
-  border-bottom:1px solid var(--border);
-  font-family:monospace;
-  font-size:0.85rem;
-  color:#aaa;
-  background:#0a0810;
-  display:flex; flex-direction:column; gap:0.15rem;
-}
-.motd-purple { color:#dd88ff; }
-.motd-blue { color:#88aaff; }
-.motd-white { color:#fff; }
-.motd-gray { color:#888; }
-.server-stats {
-  display:grid; grid-template-columns:1fr 1fr 1fr;
-  border-bottom:1px solid var(--border);
-}
-.stat {
-  padding:0.85rem 1rem;
-  border-right:1px solid var(--border);
-  text-align:center;
-}
-.stat:last-child { border-right:none; }
-.stat-val { font-weight:700; font-size:1.1rem; }
-.stat-val.green { color:var(--green); }
-.stat-val.purple { color:var(--purple2); }
-.stat-val.blue { color:var(--blue2); }
-.stat-label { font-size:0.7rem; color:var(--muted); margin-top:2px; }
-.server-players {
-  padding:0.85rem 1.25rem;
-}
-.players-title { font-size:0.75rem; color:var(--muted); margin-bottom:0.6rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; }
-.players-list { display:flex; flex-wrap:wrap; gap:0.4rem; }
-.player-tag {
-  display:flex; align-items:center; gap:0.4rem;
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:6px;
-  padding:0.25rem 0.6rem;
-  font-size:0.78rem;
-  font-family:monospace;
-}
-.player-tag::before {
-  content:'';
-  display:inline-block;
-  width:8px; height:8px;
-  border-radius:1px;
-}
-.p-green::before { background:#4ade80; }
-.p-blue::before { background:#60a5fa; }
-.p-red::before { background:#f87171; }
-.p-yellow::before { background:#fbbf24; }
-.p-purple::before { background:#c084fc; }
-.server-ping {
-  padding:0.65rem 1.25rem;
-  background:rgba(74,222,128,0.06);
-  border-top:1px solid var(--border);
-  display:flex; align-items:center; gap:0.5rem;
-  font-size:0.8rem;
-  color:var(--green);
-}
-.ping-bars { display:flex; align-items:flex-end; gap:2px; height:14px; }
-.ping-bar { width:4px; background:var(--green); border-radius:1px; }
+        /* Верхня панель зі скляними прапорами */
+        .top-nav {
+            display: flex;
+            justify-content: flex-end;
+            padding: 20px 0;
+            gap: 12px;
+        }
 
-/* ─── SECTIONS ─── */
-.wrap { max-width:1100px; margin:0 auto; padding:4rem 2rem; position:relative; z-index:1; }
-.sec-head { margin-bottom:2rem; }
-.sec-tag {
-  font-family:'Press Start 2P',monospace;
-  font-size:0.5rem;
-  color:var(--purple);
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  margin-bottom:0.75rem;
-}
-.sec-title { font-size:1.6rem; font-weight:700; margin-bottom:0.5rem; }
-.sec-sub { color:var(--muted); font-size:0.9rem; }
+        .lang-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 8px 16px;
+            border-radius: 99px;
+            color: #8e8e93;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-hr.divider { border:none; border-top:1px solid var(--border); margin:0 2rem; }
+        .lang-btn:hover, .lang-btn.active {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
 
-/* ─── RULES ─── */
-.rules-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
-.rule {
-  background:var(--bg2);
-  padding:1.25rem 1.5rem;
-  display:flex; gap:1rem; align-items:flex-start;
-  transition:background 0.2s;
-}
-.rule:hover { background:var(--bg3); }
-.rule-n {
-  font-family:'Press Start 2P',monospace;
-  font-size:0.65rem;
-  color:var(--purple2);
-  flex-shrink:0;
-  margin-top:3px;
-  width:28px;
-}
-.rule-body h4 { font-size:0.9rem; font-weight:700; margin-bottom:0.3rem; }
-.rule-body p { font-size:0.82rem; color:var(--muted); line-height:1.6; }
-.rule-tag {
-  display:inline-block;
-  font-size:0.65rem;
-  font-weight:700;
-  padding:0.15rem 0.4rem;
-  border-radius:4px;
-  margin-top:0.5rem;
-}
-.tag-ban { background:rgba(248,113,113,0.15); color:var(--red); border:1px solid rgba(248,113,113,0.3); }
-.tag-warn { background:rgba(251,191,36,0.15); color:var(--yellow); border:1px solid rgba(251,191,36,0.3); }
-.tag-info { background:rgba(130,90,255,0.15); color:var(--purple2); border:1px solid var(--border2); }
+        /* Стилізовані скляні напівпрозорі прапори */
+        .flag {
+            width: 20px;
+            height: 14px;
+            border-radius: 3px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .lang-btn:hover .flag, .lang-btn.active .flag {
+            opacity: 0.95;
+        }
+        
+        /* Скляні градієнти прапорів */
+        .flag-ua { background: linear-gradient(to bottom, rgba(0,91,187,0.7), rgba(255,213,0,0.7)); }
+        .flag-en { background: linear-gradient(135deg, rgba(1,33,105,0.7), rgba(200,16,46,0.7)); }
+        .flag-ru { background: linear-gradient(to bottom, rgba(255,255,255,0.7), rgba(0,57,166,0.7), rgba(213,43,30,0.7)); }
 
-/* ─── HOW TO JOIN ─── */
-.join-table { width:100%; border-collapse:collapse; }
-.join-table tr { border-bottom:1px solid var(--border); }
-.join-table tr:last-child { border-bottom:none; }
-.join-table td { padding:1rem 0.75rem; font-size:0.88rem; vertical-align:top; }
-.join-step-num {
-  font-family:'Press Start 2P',monospace;
-  font-size:0.55rem;
-  color:var(--purple);
-  width:36px;
-  padding-top:1.1rem;
-}
-.join-step-title { font-weight:700; font-size:0.9rem; margin-bottom:0.3rem; white-space:nowrap; }
-.join-step-desc { color:var(--muted); line-height:1.65; }
-.join-step-code {
-  font-family:monospace;
-  background:rgba(130,90,255,0.1);
-  border:1px solid var(--border2);
-  border-radius:6px;
-  padding:0.25rem 0.6rem;
-  color:var(--purple2);
-  font-size:0.9rem;
-  white-space:nowrap;
-}
-.join-img { width:90px; }
-.join-img img { width:100%; border-radius:6px; border:1px solid var(--border); }
+        /* Посилений скляний стиль iPhone (Glassmorphism Pro) */
+        .glass-card {
+            background: rgba(18, 18, 20, 0.45);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 12px 40px rgba(0, 0, 0, 0.7);
+            border-radius: 24px;
+            padding: 35px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
 
-/* ─── FAQ ─── */
-.faq { display:flex; flex-direction:column; gap:0; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
-.faq-item { border-bottom:1px solid var(--border); }
-.faq-item:last-child { border-bottom:none; }
-.faq-q {
-  width:100%; text-align:left;
-  background:var(--bg2);
-  border:none;
-  padding:1rem 1.25rem;
-  color:var(--white);
-  font-family:'Inter',sans-serif;
-  font-size:0.9rem;
-  font-weight:600;
-  cursor:pointer;
-  display:flex; justify-content:space-between; align-items:center;
-  transition:background 0.2s;
-}
-.faq-q:hover { background:var(--bg3); }
-.faq-q.open { background:var(--bg3); color:var(--purple2); }
-.faq-arr { transition:transform 0.25s; font-size:0.75rem; color:var(--muted); }
-.faq-q.open .faq-arr { transform:rotate(180deg); color:var(--purple2); }
-.faq-a {
-  display:none;
-  padding:0.85rem 1.25rem 1.1rem;
-  color:var(--muted);
-  font-size:0.87rem;
-  line-height:1.7;
-  background:rgba(130,90,255,0.04);
-  border-top:1px solid var(--border);
-}
-.faq-a.open { display:block; }
-.faq-a code {
-  font-family:monospace;
-  background:rgba(130,90,255,0.12);
-  color:var(--purple2);
-  padding:0.1rem 0.4rem;
-  border-radius:4px;
-  font-size:0.9em;
-}
+        .glass-card:hover {
+            background: rgba(22, 22, 26, 0.55);
+            border-color: rgba(168, 85, 247, 0.25);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 16px 48px rgba(168, 85, 247, 0.05);
+        }
 
-/* ─── CHANGELOG ─── */
-.changelog { display:flex; flex-direction:column; gap:0; position:relative; padding-left:2.5rem; }
-.changelog::before {
-  content:''; position:absolute;
-  left:0.6rem; top:0; bottom:0;
-  width:1px; background:linear-gradient(to bottom, var(--purple), var(--blue), transparent);
-}
-.cl-entry { position:relative; padding-bottom:1.75rem; }
-.cl-dot {
-  position:absolute; left:-2rem; top:4px;
-  width:10px; height:10px;
-  border-radius:50%; background:var(--purple);
-  border:2px solid var(--bg);
-  box-shadow:0 0 8px var(--purple);
-}
-.cl-date { font-size:0.72rem; color:var(--muted); font-weight:600; margin-bottom:0.3rem; font-family:monospace; }
-.cl-title { font-weight:700; font-size:0.95rem; margin-bottom:0.3rem; }
-.cl-items { list-style:none; }
-.cl-items li {
-  font-size:0.83rem; color:var(--muted);
-  padding:0.15rem 0;
-  display:flex; gap:0.5rem;
-}
-.cl-items li::before { content:'+'; color:var(--green); flex-shrink:0; }
-.cl-items li.fix::before { content:'~'; color:var(--yellow); }
-.cl-items li.del::before { content:'-'; color:var(--red); }
+        /* Хедер */
+        header {
+            text-align: center;
+            padding: 40px 0 50px 0;
+        }
 
-/* ─── TOAST ─── */
-#toast {
-  position:fixed; bottom:1.5rem; right:1.5rem;
-  background:var(--green); color:#000;
-  font-weight:700; font-size:0.85rem;
-  padding:0.65rem 1.25rem; border-radius:8px;
-  z-index:9999;
-  opacity:0; transform:translateY(8px);
-  transition:all 0.25s;
-  pointer-events:none;
-  font-family:'Press Start 2P',monospace;
-  font-size:0.55rem;
-}
-#toast.show { opacity:1; transform:translateY(0); }
+        header h1 {
+            font-size: 3.8rem;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            background: linear-gradient(180deg, #ffffff 30%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
 
-/* ─── FOOTER ─── */
-footer {
-  position:relative; z-index:1;
-  border-top:1px solid var(--border);
-  padding:1.5rem 2rem;
-  display:flex; align-items:center; justify-content:space-between;
-  gap:1rem; flex-wrap:wrap;
-}
-.footer-left { display:flex; align-items:center; gap:1rem; }
-.footer-logo { font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--purple2); }
-.footer-ip { font-family:monospace; font-size:0.9rem; color:var(--muted); }
-.footer-right { font-size:0.78rem; color:rgba(255,255,255,0.2); }
+        header p {
+            color: #8e8e93;
+            font-size: 1.25rem;
+            margin-bottom: 30px;
+        }
 
-/* ─── MEDIA ─── */
-@media (max-width:768px) {
-  .hero { grid-template-columns:1fr; padding:5rem 1.25rem 2rem; }
-  .server-card { display:none; }
-  nav { padding:0 1.25rem; }
-  .nav-links { display:none; }
-  .wrap { padding:3rem 1.25rem; }
-  footer { flex-direction:column; align-items:flex-start; }
-}
-</style>
+        /* Скопіювати IP */
+        .ip-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px 28px;
+            border-radius: 99px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+            transition: all 0.2s ease;
+        }
+
+        .ip-badge:hover {
+            background: rgba(168, 85, 247, 0.12);
+            border-color: rgba(168, 85, 247, 0.5);
+            transform: scale(1.02);
+        }
+
+        .ip-badge span {
+            color: #a855f7;
+            margin-left: 10px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            background: rgba(168, 85, 247, 0.15);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+
+        /* Гріди та блоки */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        h2 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 24px;
+            background: #a855f7;
+            border-radius: 2px;
+        }
+
+        p {
+            color: #98989d;
+            line-height: 1.65;
+            font-size: 1.05rem;
+        }
+
+        ul { list-style: none; }
+
+        li {
+            margin-bottom: 16px;
+            line-height: 1.5;
+            color: #e5e5ea;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        li::before {
+            content: "✦";
+            color: #a855f7;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .feature-box {
+            background: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 18px;
+            margin-top: 14px;
+            border-left: 4px solid #6366f1;
+        }
+
+        .feature-box strong {
+            color: #fff;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .sub-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255,255,255,0.03);
+            padding: 20px;
+            border-radius: 18px;
+        }
+
+        .sub-card h3 { color: #fff; font-size: 1.15rem; margin-bottom: 6px; }
+        .sub-card p { font-size: 0.95rem; color: #8e8e93; }
+
+        ol { color: #e5e5ea; padding-left: 20px; line-height: 1.9; }
+        ol li::before { content: none; }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 2.8rem; }
+            .glass-card { padding: 25px; }
+            .top-nav { justify-content: center; }
+        }
+    </style>
 </head>
 <body>
 
-<div id="toast">Скопировано!</div>
+    <div class="bg-blur-1"></div>
+    <div class="bg-blur-2"></div>
 
-<!-- NAV -->
-<nav>
-  <a class="nav-logo" href="#">Maloshko SMP</a>
-  <ul class="nav-links">
-    <li><a href="#connect">Подключение</a></li>
-    <li><a href="#rules">Правила</a></li>
-    <li><a href="#join">Как зайти</a></li>
-    <li><a href="#faq">FAQ</a></li>
-    <li><a href="#changelog">Обновления</a></li>
-  </ul>
-  <div class="nav-status">
-    <div class="dot"></div>
-    Сервер онлайн
-  </div>
-</nav>
+    <div class="container">
+        
+        <!-- Кнопки вибору мови -->
+        <div class="top-nav">
+            <div class="lang-btn active" onclick="setLanguage('uk')">
+                <div class="flag flag-ua"></div> UA
+            </div>
+            <div class="lang-btn" onclick="setLanguage('ru')">
+                <div class="flag flag-ru"></div> RU
+            </div>
+            <div class="lang-btn" onclick="setLanguage('en')">
+                <div class="flag flag-en"></div> EN
+            </div>
+        </div>
+        
+        <!-- Хедер -->
+        <header>
+            <h1>maloshko.fun</h1>
+            <p id="server-subtitle">Приватний Ванільний Сервер • Версія 1.20+ / 1.21.1</p>
+            <div class="ip-badge" onclick="copyIP()">
+                IP: maloshko.fun <span id="copy-text">Клацни щоб скопіювати</span>
+            </div>
+        </header>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-left">
-    <div class="hero-tag">▸ Vanilla SMP</div>
-    <h1 class="hero-title">Maloshko<br><span>SMP</span></h1>
-    <p class="hero-desc">
-      Ванильный выживач без модов и плагинов. Только ты, мир и другие игроки. Никакого доната, никакого Pay-to-Win.
-    </p>
-    <div class="hero-ip-row" id="connect">
-      <div class="hero-ip-label">IP</div>
-      <div class="hero-ip-addr">maloshko.fun</div>
-      <button class="copy-btn" id="copyBtn" onclick="copyIP()">Копировать</button>
-    </div>
-    <div class="versions-row">
-      <span class="vtag">Java 1.20.x</span>
-      <span class="vtag">Java 1.21.1</span>
-      <span class="vtag">Ванила</span>
-    </div>
-  </div>
+        <!-- Про створення -->
+        <div class="glass-card">
+            <h2 id="title-about">Про створення</h2>
+            <p id="desc-about">
+                <b>maloshko.fun</b> — це простір, створений для тих, хто втомився від перевантажених серверів з мільйонами непотрібних плагінів, донатерським креативом та токсичним ком'юніті. Наш сервер побудований на концепції чистокровної, лампової ванілі останніх версій (1.20+ до 1.21.1). Ми створили місце, де гравець і його історія стоять на першому місці.
+            </p>
+        </div>
 
-  <!-- Fake Minecraft server status card -->
-  <div class="server-card">
-    <div class="server-card-header">
-      <div class="server-icon">🧱</div>
-      <div>
-        <div class="server-name">Maloshko SMP</div>
-        <div class="server-host">maloshko.fun · 25565</div>
-      </div>
-    </div>
-    <div class="server-motd">
-      <span class="motd-purple">▌ Maloshko <span class="motd-blue">SMP</span></span>
-      <span class="motd-gray">· Ваниль · 1.20 — 1.21.1 · без доната ·</span>
-    </div>
-    <div class="server-stats">
-      <div class="stat">
-        <div class="stat-val green">●&nbsp;Онлайн</div>
-        <div class="stat-label">Статус</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val purple">4 / 20</div>
-        <div class="stat-label">Игроков</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val blue">18ms</div>
-        <div class="stat-label">Пинг</div>
-      </div>
-    </div>
-    <div class="server-players">
-      <div class="players-title">Сейчас онлайн</div>
-      <div class="players-list">
-        <div class="player-tag p-green">Малошко</div>
-        <div class="player-tag p-blue">Steve_dev</div>
-        <div class="player-tag p-yellow">Notch_fan</div>
-        <div class="player-tag p-purple">XxCreeperxX</div>
-      </div>
-    </div>
-    <div class="server-ping">
-      <div class="ping-bars">
-        <div class="ping-bar" style="height:4px"></div>
-        <div class="ping-bar" style="height:7px"></div>
-        <div class="ping-bar" style="height:10px"></div>
-        <div class="ping-bar" style="height:14px"></div>
-      </div>
-      Хорошее соединение · 18ms
-    </div>
-  </div>
-</div>
+        <!-- Переваги -->
+        <div class="grid">
+            <div class="glass-card">
+                <h2 id="title-why-us">Чому ми кращі?</h2>
+                <ul id="list-why-us">
+                    <li><strong>Чиста Ваніль:</strong> Жодного втручання в ігровий процес, гриферських команд чи куплених адмінок.</li>
+                    <li><strong>Ідеальний ТПС (TPS 20.0):</strong> Потужне залізо та оптимізоване ядро гарантують повну відсутність лагів.</li>
+                    <li><strong>Стабільна Економіка:</strong> Все тримається на взаємодії між гравцями та довірі.</li>
+                </ul>
+            </div>
 
-<hr class="divider">
+            <div class="glass-card">
+                <h2 id="title-unique">Унікальності</h2>
+                <div class="feature-box">
+                    <strong id="uniq-1-t">Атмосфера iPhone-style</strong>
+                    <span id="uniq-1-d">Лаконічність, мінімалізм у кожній деталі на сервері та в табі.</span>
+                </div>
+                <div class="feature-box" style="border-left-color: #a855f7;">
+                    <strong id="uniq-2-t">Жива історія</strong>
+                    <span id="uniq-2-d">Світ не вайпається кожні два тижні — твої масштабні проєкти та бази залишаться цілими.</span>
+                </div>
+            </div>
+        </div>
 
-<!-- RULES -->
-<div class="wrap" id="rules">
-  <div class="sec-head">
-    <div class="sec-tag">// Правила</div>
-    <h2 class="sec-title">Правила сервера</h2>
-    <p class="sec-sub">Нарушение — бан без предупреждений. Читай внимательно.</p>
-  </div>
-  <div class="rules-grid">
-    <div class="rule">
-      <div class="rule-n">01</div>
-      <div class="rule-body">
-        <h4>Никаких читов</h4>
-        <p>Запрещены любые клиенты и моды, дающие нечестное преимущество: X-Ray, килауры, speedhack, flymod и т.д.</p>
-        <span class="rule-tag tag-ban">Перманент</span>
-      </div>
-    </div>
-    <div class="rule">
-      <div class="rule-n">02</div>
-      <div class="rule-body">
-        <h4>Гриферство запрещено</h4>
-        <p>Нельзя ломать, поджигать и взрывать чужие постройки. Воровство из сундуков тоже запрещено.</p>
-        <span class="rule-tag tag-ban">Перманент</span>
-      </div>
-    </div>
-    <div class="rule">
-      <div class="rule-n">03</div>
-      <div class="rule-body">
-        <h4>PvP без согласия</h4>
-        <p>Убивать игроков без их согласия запрещено. Исключение — специально обозначенные PvP-зоны.</p>
-        <span class="rule-tag tag-ban">Бан / откат</span>
-      </div>
-    </div>
-    <div class="rule">
-      <div class="rule-n">04</div>
-      <div class="rule-body">
-        <h4>Нормальное общение</h4>
-        <p>Оскорбления, расизм, угрозы и целенаправленная токсичность — запрещены.</p>
-        <span class="rule-tag tag-warn">Mute → Бан</span>
-      </div>
-    </div>
-    <div class="rule">
-      <div class="rule-n">05</div>
-      <div class="rule-body">
-        <h4>Не лагай сервер</h4>
-        <p>Лагосборники, бесконечные фермы мобов без ограничений, нагруженный редстоун — запрещены.</p>
-        <span class="rule-tag tag-warn">Снос → Бан</span>
-      </div>
-    </div>
-    <div class="rule">
-      <div class="rule-n">06</div>
-      <div class="rule-body">
-        <h4>Строй дальше от спавна</h4>
-        <p>Минимум 500 блоков от нулевых координат. Не занимай весь спавн под себя.</p>
-        <span class="rule-tag tag-info">Рекомендация</span>
-      </div>
-    </div>
-    <div class="rule">
-      <div class="rule-n">07</div>
-      <div class="rule-body">
-        <h4>Уважай решения адмнов</h4>
-        <p>Решение администраторов окончательное. Споры — в личку, не в общий чат.</p>
-        <span class="rule-tag tag-info">Важно</span>
-      </div>
-    </div>
-    <div class="rule">
-      <div class="rule-n">08</div>
-      <div class="rule-body">
-        <h4>Один аккаунт</h4>
-        <p>Зайти с нескольких аккаунтов для обхода бана — перманентный бан всех аккаунтов.</p>
-        <span class="rule-tag tag-ban">Перманент</span>
-      </div>
-    </div>
-  </div>
-</div>
+        <!-- Чим зайнятися -->
+        <div class="glass-card">
+            <h2 id="title-activities">Чим зайнятися у нас?</h2>
+            <p id="desc-activities" style="margin-bottom: 20px;">Тут немає обмежень, ти можеш стати ким завгодно:</p>
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
+                <div class="sub-card">
+                    <h3 id="act-1-t">Будуй міста</h3>
+                    <p id="act-1-d">Об'єднуйся з друзями та зводь унікальні поселення й держави.</p>
+                </div>
+                <div class="sub-card">
+                    <h3 id="act-2-t">Розвивай бізнес</h3>
+                    <p id="act-2-d">Створюй свої магазини на спавні та торгуй за алмази.</p>
+                </div>
+                <div class="sub-card">
+                    <h3 id="act-3-t">Роби івенти</h3>
+                    <p id="act-3-d">Організовуй власні квести, суди, або будуй міні-ігри для інших.</p>
+                </div>
+            </div>
+        </div>
 
-<hr class="divider">
+        <!-- Правила та Вхід -->
+        <div class="grid">
+            <div class="glass-card">
+                <h2 id="title-rules">Короткі Правила</h2>
+                <ul id="list-rules">
+                    <li>Заборонено будь-які чити, рентген (X-Ray) та сторонній софт.</li>
+                    <li>Жодного гриферства чи крадіжок — усе логується, бан видається миттєво.</li>
+                    <li>Поважай інших гравців та їхній особистий простір.</li>
+                </ul>
+            </div>
 
-<!-- HOW TO JOIN -->
-<div class="wrap" id="join">
-  <div class="sec-head">
-    <div class="sec-tag">// Подключение</div>
-    <h2 class="sec-title">Как зайти на сервер</h2>
-    <p class="sec-sub">Поддерживается лицензионный Minecraft Java Edition.</p>
-  </div>
-  <table class="join-table">
-    <tbody>
-      <tr>
-        <td class="join-step-num">01</td>
-        <td>
-          <div class="join-step-title">Запусти Minecraft</div>
-          <div class="join-step-desc">Открой лаунчер, выбери профиль с версией <span class="join-step-code">1.20.x</span> или <span class="join-step-code">1.21.1</span> и нажми «Играть».</div>
-        </td>
-      </tr>
-      <tr>
-        <td class="join-step-num">02</td>
-        <td>
-          <div class="join-step-title">Открой «Мультиплеер»</div>
-          <div class="join-step-desc">В главном меню: <span class="join-step-code">Мультиплеер</span> → <span class="join-step-code">Добавить сервер</span>.</div>
-        </td>
-      </tr>
-      <tr>
-        <td class="join-step-num">03</td>
-        <td>
-          <div class="join-step-title">Введи адрес</div>
-          <div class="join-step-desc">В поле «Адрес сервера» вставь <span class="join-step-code">maloshko.fun</span> — порт указывать не нужно (стандартный 25565).</div>
-        </td>
-      </tr>
-      <tr>
-        <td class="join-step-num">04</td>
-        <td>
-          <div class="join-step-title">Подключись и играй</div>
-          <div class="join-step-desc">Нажми «Готово», дважды кликни по серверу в списке. При первом входе ты появишься на спавне — найди себе место минимум в 500 блоках от нуля.</div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+            <div class="glass-card">
+                <h2 id="title-connect">Як почати грати?</h2>
+                <ol id="list-connect" style="line-height: 2;">
+                    <li>Запусти Майнкрафт версії <b>1.20 - 1.21.1</b>.</li>
+                    <li>Перейди в меню "Мережева гра" -> "Додати".</li>
+                    <li>Введіть адресу: <code style="color: #a855f7; font-family: monospace; font-size: 1.1rem; background: rgba(0,0,0,0.4); padding: 2px 8px; border-radius: 6px;">maloshko.fun</code></li>
+                    <li>Підключайся та створюй свою історію!</li>
+                </ol>
+            </div>
+        </div>
 
-<hr class="divider">
+    </div>
 
-<!-- FAQ -->
-<div class="wrap" id="faq">
-  <div class="sec-head">
-    <div class="sec-tag">// FAQ</div>
-    <h2 class="sec-title">Частые вопросы</h2>
-  </div>
-  <div class="faq">
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        Сервер ванильный или есть плагины?
-        <span class="faq-arr">▼</span>
-      </button>
-      <div class="faq-a">
-        Сервер 100% ванильный — никаких плагинов, модов или изменённых механик. Только стандартный <code>vanilla server.jar</code> от Mojang. Фермы, механики и редстоун работают ровно так, как задумано разработчиками.
-      </div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        Работает ли сервер с Bedrock Edition?
-        <span class="faq-arr">▼</span>
-      </button>
-      <div class="faq-a">
-        Нет. Сервер работает только с <code>Java Edition</code>. Bedrock (Windows 10/мобилки/консоли) не поддерживается. Нужна лицензионная Java-версия 1.20+ или 1.21.1.
-      </div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        Бывают ли вайпы карты?
-        <span class="faq-arr">▼</span>
-      </button>
-      <div class="faq-a">
-        Вайп карты — крайняя мера, делается только при переходе на новую версию Minecraft с несовместимой генерацией. О вайпе объявляется заранее в дискорде за 2+ недели.
-      </div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        Сколько стоит донат?
-        <span class="faq-arr">▼</span>
-      </button>
-      <div class="faq-a">
-        Доната нет. Никаких привилегий за деньги. Все игроки в равных условиях. Сервер держится без платного доступа.
-      </div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        Как сообщить о нарушителе?
-        <span class="faq-arr">▼</span>
-      </button>
-      <div class="faq-a">
-        Сделай скриншот или запись, и напиши в личку администратору. Репорты без доказательств не рассматриваются. Главное — ник нарушителя и описание ситуации.
-      </div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        Можно ли использовать Optifine / Sodium?
-        <span class="faq-arr">▼</span>
-      </button>
-      <div class="faq-a">
-        Да. Оптимизационные клиентские моды (<code>Optifine</code>, <code>Sodium</code>, <code>Lithium</code>, <code>Iris</code>) — разрешены. Запрещены только моды, дающие игровое преимущество (X-Ray, aimbot, speedhack).
-      </div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" onclick="toggleFaq(this)">
-        Лимит игроков онлайн?
-        <span class="faq-arr">▼</span>
-      </button>
-      <div class="faq-a">
-        Лимит слотов — 20 игроков. Сервер расчитан на небольшое сообщество, где все друг друга знают. При росте комьюнити лимит может быть увеличен.
-      </div>
-    </div>
-  </div>
-</div>
+    <!-- Логіка перемикання мов та копіювання -->
+    <script>
+        const translations = {
+            uk: {
+                subtitle: "Приватний Ванільний Сервер • Версія 1.20+ / 1.21.1",
+                copy: "Клацни щоб скопіювати",
+                copied: "Скопіювано!",
+                aboutT: "Про створення",
+                aboutD: "<b>maloshko.fun</b> — це простір, створений для тих, хто втомився від перевантажених серверів з мільйонами непотрібних плагінів, донатерським креативом та токсичним ком'юніті. Наш сервер побудований на концепції чистокровної, лампової ванілі останніх версій (1.20+ до 1.21.1). Ми створили місце, де гравець і його історія стоять на першому місці.",
+                whyT: "Чому ми кращі?",
+                whyL: `<li><strong>Чиста Ваніль:</strong> Жодного втручання в ігровий процес, гриферських команд чи куплених адмінок.</li>
+                       <li><strong>Ідеальний ТПС (TPS 20.0):</strong> Потужне залізо та оптимізоване ядро гарантують повну відсутність лагів.</li>
+                       <li><strong>Стабільна Економіка:</strong> Все тримається на взаємодії між гравцями та довірі.</li>`,
+                uniqT: "Унікальності",
+                u1t: "Атмосфера iPhone-style", u1d: "Лаконічність, мінімалізм у кожній деталі на сервері та в табі.",
+                u2t: "Жива історія", u2d: "Світ не вайпається кожні два тижні — твої масштабні проєкти та бази залишаться цілими.",
+                actT: "Чим зайнятися у нас?", actD: "Тут немає обмежень, ти можеш стати ким завгодно:",
+                a1t: "Будуй міста", a1d: "Об'єднуйся з друзями та зводь унікальні поселення й держави.",
+                a2t: "Розвивай бізнес", a2d: "Створюй свої магазини на спавні та торгуй за алмази.",
+                a3t: "Роби івенти", a3d: "Організовуй власні квести, суди, або будуй міні-ігри для інших.",
+                rulesT: "Короткі Правила",
+                rulesL: `<li>Заборонено будь-які чити, рентген (X-Ray) та сторонній софт.</li>
+                         <li>Жодного гриферства чи крадіжок — усе логується, бан видається миттєво.</li>
+                         <li>Поважай інших гравців та їхній особистий простір.</li>`,
+                connT: "Як почати грати?",
+                connL: `<li>Запусти Майнкрафт версії <b>1.20 - 1.21.1</b>.</li>
+                        <li>Перейди в меню "Мережева гра" -> "Додати".</li>
+                        <li>Введіть адресу: <code style="color: #a855f7; font-family: monospace; font-size: 1.1rem; background: rgba(0,0,0,0.4); padding: 2px 8px; border-radius: 6px;">maloshko.fun</code></li>
+                        <li>Підключайся та створюй свою історію!</li>`
+            },
+            ru: {
+                subtitle: "Приватный Ванильный Сервер • Версия 1.20+ / 1.21.1",
+                copy: "Кликни для копирования",
+                copied: "Скопировано!",
+                aboutT: "О создании",
+                aboutD: "<b>maloshko.fun</b> — это пространство, созданное для тех, кто устал от перегруженных серверов с миллионами ненужных плагинов, донатерским креативом и токсичным комьюнити. Наш сервер построен на концепции чистокровной, ламповой ванили последних версий (1.20+ до 1.21.1). Мы создали место, где игрок и его история стоят на первом месте.",
+                whyT: "Почему мы лучше?",
+                whyL: `<li><strong>Чистая Ваниль:</strong> Никакого вмешательства в игровой процесс, гриферских команд или купленных админок.</li>
+                       <li><strong>Идеальный ТПС (TPS 20.0):</strong> Мощное железо и оптимизированное ядро гарантируют полное отсутствие лагов.</li>
+                       <li><strong>Стабильная Экономика:</strong> Всё держится на взаимодействии между игроками и доверии.</li>`,
+                uniqT: "Уникальности",
+                u1t: "Атмосфера iPhone-style", u1d: "Лаконичность, минимализм в каждой детали на сервере и в табе.",
+                u2t: "Живая история", u2d: "Мир не вайпается каждые две недели — твои масштабные проекты и базы останутся целыми.",
+                actT: "Чем заняться у нас?", actD: "Здесь нет ограничений, ты можешь стать кем угодно:",
+                a1t: "Строй города", a1d: "Объединяйся с друзьями и возводи уникальные поселения и государства.",
+                a2t: "Развивай бизнес", a2d: "Создавай свои магазины на спавне и торгуй за алмазы.",
+                a3t: "Делай ивенты", a3d: "Организовывай собственные квесты, суды или строй мини-игры для других.",
+                rulesT: "Короткие Правила",
+                rulesL: `<li>Запрещены любые читы, рентген (X-Ray) и сторонний софт.</li>
+                         <li>Никакого гриферства или краж — всё логируется, бан выдается моментально.</li>
+                         <li>Уважай других игроков и их личное пространство.</li>`,
+                connT: "Как начать играть?",
+                connL: `<li>Запусти Майнкрафт версии <b>1.20 - 1.21.1</b>.</li>
+                        <li>Перейди в меню "Сетевая игра" -> "Добавить".</li>
+                        <li>Введи адрес: <code style="color: #a855f7; font-family: monospace; font-size: 1.1rem; background: rgba(0,0,0,0.4); padding: 2px 8px; border-radius: 6px;">maloshko.fun</code></li>
+                        <li>Подключайся и создавай свою историю!</li>`
+            },
+            en: {
+                subtitle: "Private Vanilla Server • Version 1.20+ / 1.21.1",
+                copy: "Click to copy",
+                copied: "Copied!",
+                aboutT: "About Project",
+                aboutD: "<b>maloshko.fun</b> is a space created for those who are tired of overloaded servers with millions of useless plugins, donator creative modes, and toxic communities. Our server is built on the concept of pure, cozy vanilla of the latest versions (1.20+ to 1.21.1). We created a place where the player and their story come first.",
+                whyT: "Why We Are Better?",
+                whyL: `<li><strong>Pure Vanilla:</strong> No gameplay interference, griefing commands, or purchasable admin rights.</li>
+                       <li><strong>Perfect TPS (20.0):</strong> Powerful hardware and optimized core guarantee absolutely no lag.</li>
+                       <li><strong>Stable Economy:</strong> Everything is based on player interaction and trust.</li>`,
+                uniqT: "Uniqueness",
+                u1t: "iPhone-style Vibe", u1d: "Laconicism and minimalism in every detail on the server and in the tab menu.",
+                u2t: "Living History", u2d: "The world doesn't wipe every two weeks — your massive projects and bases stay safe.",
+                actT: "What to do here?", actD: "There are no limits, you can become anyone:",
+                a1t: "Build Cities", a1d: "Team up with friends and establish unique settlements and states.",
+                a2t: "Grow Business", a2d: "Create your shops at spawn and trade using diamonds.",
+                a3t: "Make Events", a3d: "Organize your own quests, courts, or build mini-games for others.",
+                rulesT: "Short Rules",
+                rulesL: `<li>Any cheats, X-Ray, or third-party hacks are strictly forbidden.</li>
+                         <li>No griefing or stealing — everything is logged, instant ban applied.</li>
+                         <li>Respect other players and their personal space.</li>`,
+                connT: "How to Join?",
+                connL: `<li>Launch Minecraft version <b>1.20 - 1.21.1</b>.</li>
+                        <li>Go to "Multiplayer" -> "Add Server".</li>
+                        <li>Enter address: <code style="color: #a855f7; font-family: monospace; font-size: 1.1rem; background: rgba(0,0,0,0.4); padding: 2px 8px; border-radius: 6px;">maloshko.fun</code></li>
+                        <li>Connect and create your own story!</li>`
+            }
+        };
 
-<hr class="divider">
+        let currentLang = 'uk';
 
-<!-- CHANGELOG -->
-<div class="wrap" id="changelog">
-  <div class="sec-head">
-    <div class="sec-tag">// Обновления</div>
-    <h2 class="sec-title">История изменений</h2>
-    <p class="sec-sub">Что менялось на сервере</p>
-  </div>
-  <div class="changelog">
-    <div class="cl-entry">
-      <div class="cl-dot"></div>
-      <div class="cl-date">Июнь 2025</div>
-      <div class="cl-title">Обновление 1.21.1</div>
-      <ul class="cl-items">
-        <li>Добавлена поддержка Minecraft 1.21.1</li>
-        <li>Обновлён сайт</li>
-        <li class="fix">Исправлен баг с телепортацией в Энд</li>
-      </ul>
-    </div>
-    <div class="cl-entry">
-      <div class="cl-dot"></div>
-      <div class="cl-date">Март 2025</div>
-      <div class="cl-title">Правила и модерация</div>
-      <ul class="cl-items">
-        <li>Добавлено правило про мультиаккаунты</li>
-        <li>Уточнена зона вокруг спавна (500 блоков)</li>
-        <li class="fix">Снижена нагрузка от стартовой зоны</li>
-      </ul>
-    </div>
-    <div class="cl-entry">
-      <div class="cl-dot"></div>
-      <div class="cl-date">Декабрь 2024</div>
-      <div class="cl-title">Поддержка 1.20</div>
-      <ul class="cl-items">
-        <li>Сервер переехал на 1.20</li>
-        <li>Обновлена карта — добавлены новые биомы</li>
-        <li class="del">Убран временный ивентовый мир</li>
-      </ul>
-    </div>
-    <div class="cl-entry">
-      <div class="cl-dot"></div>
-      <div class="cl-date">Сентябрь 2024</div>
-      <div class="cl-title">Запуск сервера</div>
-      <ul class="cl-items">
-        <li>Сервер запущен на версии 1.19.4</li>
-        <li>Создан сайт maloshko.fun</li>
-      </ul>
-    </div>
-  </div>
-</div>
+        function setLanguage(lang) {
+            currentLang = lang;
+            
+            // Оновлюємо статус кнопок
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-left">
-    <div class="footer-logo">Maloshko SMP</div>
-    <div class="footer-ip">maloshko.fun</div>
-  </div>
-  <div class="footer-right">Не связан с Mojang / Microsoft · Java Edition only</div>
-</footer>
+            // Заміна текстів
+            document.getElementById('server-subtitle').innerText = translations[lang].subtitle;
+            document.getElementById('copy-text').innerText = translations[lang].copy;
+            document.getElementById('title-about').innerText = translations[lang].aboutT;
+            document.getElementById('desc-about').innerHTML = translations[lang].aboutD;
+            document.getElementById('title-why-us').innerText = translations[lang].whyT;
+            document.getElementById('list-why-us').innerHTML = translations[lang].whyL;
+            document.getElementById('title-unique').innerText = translations[lang].uniqT;
+            document.getElementById('uniq-1-t').innerText = translations[lang].u1t;
+            document.getElementById('uniq-1-d').innerText = translations[lang].u1d;
+            document.getElementById('uniq-2-t').innerText = translations[lang].u2t;
+            document.getElementById('uniq-2-d').innerText = translations[lang].u2d;
+            document.getElementById('title-activities').innerText = translations[lang].actT;
+            document.getElementById('desc-activities').innerText = translations[lang].actD;
+            document.getElementById('act-1-t').innerText = translations[lang].a1t;
+            document.getElementById('act-1-d').innerText = translations[lang].a1d;
+            document.getElementById('act-2-t').innerText = translations[lang].a2t;
+            document.getElementById('act-2-d').innerText = translations[lang].a2d;
+            document.getElementById('act-3-t').innerText = translations[lang].a3t;
+            document.getElementById('act-3-d').innerText = translations[lang].a3d;
+            document.getElementById('title-rules').innerText = translations[lang].rulesT;
+            document.getElementById('list-rules').innerHTML = translations[lang].rulesL;
+            document.getElementById('title-connect').innerText = translations[lang].connT;
+            document.getElementById('list-connect').innerHTML = translations[lang].connL;
+        }
 
-<script>
-function copyIP() {
-  navigator.clipboard.writeText('maloshko.fun').then(() => {
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = 'Скопировано!';
-    btn.classList.add('copied');
-    const t = document.getElementById('toast');
-    t.classList.add('show');
-    setTimeout(() => { t.classList.remove('show'); btn.textContent = 'Копировать'; btn.classList.remove('copied'); }, 2000);
-  });
-}
-
-function toggleFaq(btn) {
-  const ans = btn.nextElementSibling;
-  const isOpen = btn.classList.contains('open');
-  document.querySelectorAll('.faq-q.open').forEach(b => { b.classList.remove('open'); b.nextElementSibling.classList.remove('open'); });
-  if (!isOpen) { btn.classList.add('open'); ans.classList.add('open'); }
-}
-</script>
+        function copyIP() {
+            const ip = "maloshko.fun";
+            navigator.clipboard.writeText(ip).then(() => {
+                const badge = document.getElementById('copy-text');
+                badge.innerText = translations[currentLang].copied;
+                badge.style.background = "#22c55e";
+                badge.style.color = "#fff";
+                
+                setTimeout(() => {
+                    badge.innerText = translations[currentLang].copy;
+                    badge.style.background = "rgba(168, 85, 247, 0.15)";
+                    badge.style.color = "#a855f7";
+                }, 2000);
+            });
+        }
+    </script>
 </body>
 </html>
