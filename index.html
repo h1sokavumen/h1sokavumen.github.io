@@ -2,819 +2,801 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Maloshko Shop - Idle Tycoon</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maloshko SMP</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* === БАЗОВЫЕ СТИЛИ === */
 :root {
-  --bg-dark: #120d0a; --wood-dark: #2c1e16; --wood-light: #4a3320;
-  --gold: #d4af37; --gold-dim: #997a15; --text-main: #fdf5e6;
-  --text-muted: #a89f91; --accent-green: #4caf50; --accent-red: #f44336;
-  --accent-blue: #2196f3; --np-red: #ed1c24; --paper: #f4e4bc;
-  --font-main: 'Segoe UI', Roboto, sans-serif; --font-display: 'Georgia', serif;
+  --bg: #0d0b14;
+  --bg2: #13101f;
+  --bg3: #1a1630;
+  --border: rgba(130,90,255,0.2);
+  --border2: rgba(130,90,255,0.45);
+  --purple: #825aff;
+  --purple2: #b48aff;
+  --blue: #4488ff;
+  --blue2: #7bb3ff;
+  --white: #eeeeff;
+  --muted: rgba(220,215,255,0.55);
+  --green: #4ade80;
+  --red: #f87171;
+  --yellow: #fbbf24;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-main); overflow: hidden; user-select: none; height: 100dvh; display: flex; flex-direction: column; }
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--bg); color:var(--white); font-family:'Inter',sans-serif; overflow-x:hidden; }
 
-/* === ЭКРАНЫ === */
-.screen { position: absolute; inset: 0; display: none; flex-direction: column; height: 100%; }
-.screen.active { display: flex; }
-
-/* === ГЛАВНОЕ МЕНЮ === */
-#main-menu { background: radial-gradient(circle at center, var(--wood-light), var(--bg-dark)); align-items: center; justify-content: center; text-align: center; }
-.logo { font-family: var(--font-display); font-size: clamp(35px, 7vw, 70px); color: var(--gold); text-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); margin-bottom: 10px; font-weight: bold; transition: 0.3s; }
-.subtitle { color: var(--text-muted); font-size: clamp(12px, 3vw, 18px); margin-bottom: 40px; letter-spacing: 2px; }
-.menu-btns { display: flex; flex-direction: column; gap: 15px; width: 80%; max-width: 300px; }
-.btn-menu { background: linear-gradient(135deg, var(--gold), var(--gold-dim)); color: #000; font-size: 18px; font-weight: bold; padding: 15px; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: 0.2s; }
-.btn-menu:active { transform: scale(0.95); }
-
-/* === ИГРОВОЙ ЭКРАН === */
-#game-screen { background: linear-gradient(to bottom, #1a120c, #0a0705); }
-
-/* HUD */
-.hud { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: rgba(0, 0, 0, 0.8); border-bottom: 2px solid var(--gold-dim); z-index: 20; flex-wrap: wrap; gap: 10px; flex-shrink: 0;}
-.hud-item { display: flex; flex-direction: column; align-items: center; }
-.hud-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
-.hud-value { font-size: 16px; font-weight: bold; color: var(--gold); font-family: monospace; }
-.hud-value.green { color: var(--accent-green); }
-.hud-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;}
-.btn-hud { background: var(--wood-light); border: 1px solid var(--gold); color: var(--text-main); padding: 6px 8px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s;}
-.btn-hud:hover { background: var(--gold); color: #000; }
-.btn-np { background: var(--np-red); border-color: #fff; color: #fff; }
-.btn-upg { background: #673ab7; border-color: #d1c4e9; color: #fff; }
-.btn-staff { background: #ff9800; border-color: #fff; color: #fff; }
-
-/* Игровая зона */
-.game-area { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-
-/* Полки */
-.shelves-container { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-.shelf { background: linear-gradient(to bottom, var(--wood-light), var(--wood-dark)); border-bottom: 6px solid #1a1109; border-radius: 4px; display: flex; justify-content: center; gap: 15px; padding: 10px 10px 0 10px; box-shadow: 0 10px 15px rgba(0,0,0,0.5); flex-wrap: wrap; min-height: 80px; position: relative;}
-.product { position: relative; cursor: pointer; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; }
-.product:hover { transform: translateY(-5px); }
-.product.selected { transform: translateY(-10px) scale(1.1); filter: drop-shadow(0 0 10px var(--gold)); }
-.prod-qty { position: absolute; top: -8px; right: -8px; background: var(--accent-blue); color: #fff; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 10px; border: 1px solid #fff; z-index: 2;}
-.prod-name { font-size: 11px; color: var(--text-muted); margin-top: 5px; text-align: center; }
-
-/* Визуальные апгрейды */
-.shelf.fridge { background: linear-gradient(to bottom, #e0f7fa, #80deea); border-bottom: 6px solid #006064; box-shadow: inset 0 0 20px rgba(255,255,255,0.8), 0 10px 15px rgba(0,0,0,0.5); }
-.shelf.fridge .prod-name { color: #006064; font-weight: bold; }
-.shelf.fridge::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(255,255,255,0.1) 100%); pointer-events: none; }
-.alarm-light { position: absolute; top: 10px; right: 20px; width: 15px; height: 15px; background: red; border-radius: 50%; box-shadow: 0 0 10px red; display: none; z-index: 5; }
-.alarm-light.active { display: block; animation: blink 2s infinite; }
-@keyframes blink { 0%, 100% { opacity: 0.3; box-shadow: none; } 50% { opacity: 1; box-shadow: 0 0 20px red, 0 0 40px red; } }
-.neon-active { text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #ff00de, 0 0 30px #ff00de, 0 0 40px #ff00de !important; color: #fff !important; }
-
-/* Прилавок и Персонажи */
-.counter-area { height: 180px; background: linear-gradient(to top, var(--wood-dark), transparent); position: relative; display: flex; align-items: flex-end; justify-content: center; flex-shrink: 0; }
-.counter-desk { position: absolute; bottom: 0; width: 100%; height: 50px; background: linear-gradient(to bottom, var(--wood-light), #1a1109); border-top: 4px solid var(--gold-dim); z-index: 5; }
-
-/* Продавец (Твое фото) */
-.seller { position: absolute; bottom: 45px; right: 15%; z-index: 3; display: flex; flex-direction: column; align-items: center; }
-.seller-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); object-fit: cover; background: #333; }
-.seller-name { font-size: 10px; background: rgba(0,0,0,0.7); padding: 2px 5px; border-radius: 3px; margin-top: 5px; color: var(--gold); }
-
-/* Покупатель */
-.customer { position: absolute; bottom: 10px; left: 15%; z-index: 6; transition: opacity 0.3s; opacity: 0; pointer-events: auto; cursor: pointer; }
-.customer.visible { opacity: 1; animation: slideUp 0.4s ease-out; }
-@keyframes slideUp { from { transform: translate(-50%, 50px); opacity: 0; } to { transform: translate(0, 0); opacity: 1; } }
-
-/* Анимация разговора */
-@keyframes talkShake { 0% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-3px) rotate(-2deg); } 50% { transform: translateY(0) rotate(2deg); } 75% { transform: translateY(-3px) rotate(-1deg); } 100% { transform: translateY(0) rotate(0deg); } }
-.talking { animation: talkShake 0.3s infinite; }
-
-/* Всплывающий пассивный доход */
-.floating-income { position: absolute; bottom: 80px; right: 30%; color: var(--accent-green); font-weight: bold; font-size: 18px; pointer-events: none; animation: floatUp 1.5s ease-out forwards; z-index: 50; text-shadow: 0 0 5px #000; }
-@keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-60px); opacity: 0; } }
-
-/* Диалоги */
-.bubble { position: absolute; bottom: 100%; background: var(--text-main); color: #000; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.5); width: max-content; max-width: 200px; text-align: center; margin-bottom: 10px; opacity: 0; transition: 0.2s; z-index: 10;}
-.bubble.show { opacity: 1; }
-.bubble-cust { left: 50%; transform: translateX(-50%); }
-.bubble-cust::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border-width: 8px; border-style: solid; border-color: var(--text-main) transparent transparent transparent; }
-.bubble-seller { right: 50%; transform: translateX(50%); background: #e3f2fd; }
-.bubble-seller::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border-width: 8px; border-style: solid; border-color: #e3f2fd transparent transparent transparent; }
-
-.customer:hover .bubble-cust { opacity: 1; z-index: 100; }
-
-/* Касса (Нижняя панель) */
-.register-panel { background: rgba(20, 15, 10, 0.98); border-top: 2px solid var(--gold-dim); padding: 10px 15px; width: 100%; flex-shrink: 0; z-index: 20; box-shadow: 0 -5px 20px rgba(0,0,0,0.8); }
-.reg-info { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
-.reg-col { flex: 1; min-width: 45%; }
-.reg-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: var(--text-main); }
-.reg-row.total { border-top: 1px dashed #555; padding-top: 4px; font-weight: bold; font-size: 14px; }
-
-.btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
-.btn { flex: 1; padding: 12px 5px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 12px; transition: 0.2s; text-align: center; min-width: 30%; }
-.btn:active { transform: scale(0.95); }
-.btn:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); }
-.btn-give { background: var(--accent-green); color: #fff; }
-.btn-refuse { background: #555; color: #fff; }
-.btn-debt { background: var(--accent-red); color: #fff; display: none; }
-.btn-accept-debt { background: var(--accent-blue); color: #fff; display: none; }
-.btn-out-of-stock { background: #ff9800; color: #fff; display: none; }
-
-/* === МОДАЛЬНЫЕ ОКНА === */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
-.modal-overlay.active { display: flex; }
-.modal { background: var(--wood-dark); border: 2px solid var(--gold); border-radius: 10px; padding: 20px; width: 90%; max-width: 450px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); max-height: 90vh; display: flex; flex-direction: column;}
-.modal-title { color: var(--gold); font-size: 18px; text-align: center; margin-bottom: 15px; font-family: var(--font-display); text-transform: uppercase;}
-
-.scroll-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; max-height: 300px;}
-.list-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; border: 1px solid #444;}
-.btn-action { background: var(--gold); color: #000; border: none; padding: 5px 10px; border-radius: 3px; font-weight: bold; cursor: pointer; }
-.btn-action:disabled { background: #555; color: #888; }
-
-.btn-close { width: 100%; padding: 12px; margin-top: 15px; background: transparent; border: 1px solid var(--gold); color: var(--gold); border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-.btn-close:hover { background: var(--gold); color: #000; }
-
-/* Холст для подписи */
-.signature-pad { background: #fff; border: 2px solid #333; border-radius: 5px; width: 100%; height: 150px; cursor: crosshair; touch-action: none; }
-.sig-controls { display: flex; gap: 10px; margin-top: 10px; }
-
-/* Уведомления */
-.toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); border: 1px solid var(--gold); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s; text-align: center; }
-.toast.show { opacity: 1; }
-
-/* ПК Версия */
-@media (min-width: 769px) { 
-  .game-area { flex-direction: row; }
-  .shelves-container { flex: 1; }
-  .right-panel { width: 350px; display: flex; flex-direction: column; border-left: 2px solid var(--gold-dim); background: var(--bg-dark);}
-  .counter-area { flex: 1; }
-  .register-panel { border-top: 2px solid var(--gold-dim); }
+/* ─── PIXEL GRID BG ─── */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:0;
+  background-image:
+    linear-gradient(rgba(130,90,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(130,90,255,0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events:none;
 }
-@media (max-width: 768px) {
-  .right-panel { display: contents; }
+
+/* ─── NAV ─── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 2rem;
+  height:54px;
+  background:rgba(13,11,20,0.85);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo {
+  font-family:'Press Start 2P',monospace;
+  font-size:0.7rem;
+  color:var(--purple2);
+  letter-spacing:0.05em;
+  text-decoration:none;
+}
+.nav-links { display:flex; gap:0; list-style:none; }
+.nav-links a {
+  display:block;
+  padding:0 1rem;
+  line-height:54px;
+  color:var(--muted);
+  text-decoration:none;
+  font-size:0.85rem;
+  font-weight:500;
+  transition:color 0.2s;
+  border-left:1px solid var(--border);
+}
+.nav-links a:hover { color:var(--white); }
+.nav-links li:last-child a { border-right:1px solid var(--border); }
+.nav-status {
+  display:flex; align-items:center; gap:0.5rem;
+  font-size:0.78rem; color:var(--muted);
+}
+.dot { width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green); }
+
+/* ─── HERO ─── */
+.hero {
+  position:relative; z-index:1;
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+  gap:2rem;
+  padding:5rem 3rem 3rem;
+  max-width:1200px; margin:0 auto;
+}
+.hero-left { }
+.hero-tag {
+  display:inline-block;
+  font-family:'Press Start 2P',monospace;
+  font-size:0.55rem;
+  color:var(--purple);
+  border:1px solid var(--border2);
+  padding:0.4rem 0.8rem;
+  border-radius:4px;
+  background:rgba(130,90,255,0.08);
+  margin-bottom:1.5rem;
+  letter-spacing:0.05em;
+}
+.hero-title {
+  font-family:'Press Start 2P',monospace;
+  font-size:clamp(1.4rem, 3.5vw, 2.5rem);
+  line-height:1.5;
+  margin-bottom:0.75rem;
+  color:var(--white);
+}
+.hero-title span { color:var(--purple2); }
+.hero-desc {
+  color:var(--muted);
+  font-size:0.95rem;
+  line-height:1.75;
+  max-width:480px;
+  margin-bottom:2rem;
+}
+.hero-ip-row {
+  display:flex; align-items:stretch; gap:0;
+  border:1px solid var(--border2);
+  border-radius:10px;
+  overflow:hidden;
+  background:var(--bg2);
+  margin-bottom:1.25rem;
+  max-width:420px;
+}
+.hero-ip-label {
+  padding:0 1rem;
+  background:rgba(130,90,255,0.12);
+  display:flex; align-items:center;
+  font-family:'Press Start 2P',monospace;
+  font-size:0.5rem;
+  color:var(--purple2);
+  border-right:1px solid var(--border2);
+  white-space:nowrap;
+}
+.hero-ip-addr {
+  flex:1; padding:0 1rem;
+  display:flex; align-items:center;
+  font-family:monospace;
+  font-size:1.15rem;
+  font-weight:700;
+  color:var(--white);
+  letter-spacing:0.03em;
+}
+.copy-btn {
+  padding:0 1rem;
+  border:none;
+  background:var(--purple);
+  color:white;
+  font-size:0.78rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:background 0.2s;
+  font-family:'Inter',sans-serif;
+  white-space:nowrap;
+}
+.copy-btn:hover { background:#9b6fff; }
+.copy-btn.copied { background:var(--green); color:#000; }
+
+.versions-row { display:flex; gap:0.5rem; flex-wrap:wrap; }
+.vtag {
+  background:rgba(68,136,255,0.1);
+  border:1px solid rgba(68,136,255,0.35);
+  color:var(--blue2);
+  font-size:0.78rem;
+  font-weight:600;
+  padding:0.3rem 0.7rem;
+  border-radius:6px;
+  font-family:monospace;
+}
+
+/* ─── HERO RIGHT — FAKE SERVER STATUS CARD ─── */
+.server-card {
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-radius:14px;
+  overflow:hidden;
+}
+.server-card-header {
+  display:flex; align-items:center; gap:0.75rem;
+  padding:1rem 1.25rem;
+  border-bottom:1px solid var(--border);
+  background:rgba(130,90,255,0.06);
+}
+.server-icon {
+  width:48px; height:48px;
+  border-radius:8px;
+  background: linear-gradient(135deg, #2a1060, #0a1a60);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.6rem;
+  flex-shrink:0;
+}
+.server-name { font-weight:700; font-size:1rem; }
+.server-host { font-size:0.8rem; color:var(--muted); margin-top:2px; }
+.server-motd {
+  padding:0.85rem 1.25rem;
+  border-bottom:1px solid var(--border);
+  font-family:monospace;
+  font-size:0.85rem;
+  color:#aaa;
+  background:#0a0810;
+  display:flex; flex-direction:column; gap:0.15rem;
+}
+.motd-purple { color:#dd88ff; }
+.motd-blue { color:#88aaff; }
+.motd-white { color:#fff; }
+.motd-gray { color:#888; }
+.server-stats {
+  display:grid; grid-template-columns:1fr 1fr 1fr;
+  border-bottom:1px solid var(--border);
+}
+.stat {
+  padding:0.85rem 1rem;
+  border-right:1px solid var(--border);
+  text-align:center;
+}
+.stat:last-child { border-right:none; }
+.stat-val { font-weight:700; font-size:1.1rem; }
+.stat-val.green { color:var(--green); }
+.stat-val.purple { color:var(--purple2); }
+.stat-val.blue { color:var(--blue2); }
+.stat-label { font-size:0.7rem; color:var(--muted); margin-top:2px; }
+.server-players {
+  padding:0.85rem 1.25rem;
+}
+.players-title { font-size:0.75rem; color:var(--muted); margin-bottom:0.6rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; }
+.players-list { display:flex; flex-wrap:wrap; gap:0.4rem; }
+.player-tag {
+  display:flex; align-items:center; gap:0.4rem;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:6px;
+  padding:0.25rem 0.6rem;
+  font-size:0.78rem;
+  font-family:monospace;
+}
+.player-tag::before {
+  content:'';
+  display:inline-block;
+  width:8px; height:8px;
+  border-radius:1px;
+}
+.p-green::before { background:#4ade80; }
+.p-blue::before { background:#60a5fa; }
+.p-red::before { background:#f87171; }
+.p-yellow::before { background:#fbbf24; }
+.p-purple::before { background:#c084fc; }
+.server-ping {
+  padding:0.65rem 1.25rem;
+  background:rgba(74,222,128,0.06);
+  border-top:1px solid var(--border);
+  display:flex; align-items:center; gap:0.5rem;
+  font-size:0.8rem;
+  color:var(--green);
+}
+.ping-bars { display:flex; align-items:flex-end; gap:2px; height:14px; }
+.ping-bar { width:4px; background:var(--green); border-radius:1px; }
+
+/* ─── SECTIONS ─── */
+.wrap { max-width:1100px; margin:0 auto; padding:4rem 2rem; position:relative; z-index:1; }
+.sec-head { margin-bottom:2rem; }
+.sec-tag {
+  font-family:'Press Start 2P',monospace;
+  font-size:0.5rem;
+  color:var(--purple);
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  margin-bottom:0.75rem;
+}
+.sec-title { font-size:1.6rem; font-weight:700; margin-bottom:0.5rem; }
+.sec-sub { color:var(--muted); font-size:0.9rem; }
+
+hr.divider { border:none; border-top:1px solid var(--border); margin:0 2rem; }
+
+/* ─── RULES ─── */
+.rules-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+.rule {
+  background:var(--bg2);
+  padding:1.25rem 1.5rem;
+  display:flex; gap:1rem; align-items:flex-start;
+  transition:background 0.2s;
+}
+.rule:hover { background:var(--bg3); }
+.rule-n {
+  font-family:'Press Start 2P',monospace;
+  font-size:0.65rem;
+  color:var(--purple2);
+  flex-shrink:0;
+  margin-top:3px;
+  width:28px;
+}
+.rule-body h4 { font-size:0.9rem; font-weight:700; margin-bottom:0.3rem; }
+.rule-body p { font-size:0.82rem; color:var(--muted); line-height:1.6; }
+.rule-tag {
+  display:inline-block;
+  font-size:0.65rem;
+  font-weight:700;
+  padding:0.15rem 0.4rem;
+  border-radius:4px;
+  margin-top:0.5rem;
+}
+.tag-ban { background:rgba(248,113,113,0.15); color:var(--red); border:1px solid rgba(248,113,113,0.3); }
+.tag-warn { background:rgba(251,191,36,0.15); color:var(--yellow); border:1px solid rgba(251,191,36,0.3); }
+.tag-info { background:rgba(130,90,255,0.15); color:var(--purple2); border:1px solid var(--border2); }
+
+/* ─── HOW TO JOIN ─── */
+.join-table { width:100%; border-collapse:collapse; }
+.join-table tr { border-bottom:1px solid var(--border); }
+.join-table tr:last-child { border-bottom:none; }
+.join-table td { padding:1rem 0.75rem; font-size:0.88rem; vertical-align:top; }
+.join-step-num {
+  font-family:'Press Start 2P',monospace;
+  font-size:0.55rem;
+  color:var(--purple);
+  width:36px;
+  padding-top:1.1rem;
+}
+.join-step-title { font-weight:700; font-size:0.9rem; margin-bottom:0.3rem; white-space:nowrap; }
+.join-step-desc { color:var(--muted); line-height:1.65; }
+.join-step-code {
+  font-family:monospace;
+  background:rgba(130,90,255,0.1);
+  border:1px solid var(--border2);
+  border-radius:6px;
+  padding:0.25rem 0.6rem;
+  color:var(--purple2);
+  font-size:0.9rem;
+  white-space:nowrap;
+}
+.join-img { width:90px; }
+.join-img img { width:100%; border-radius:6px; border:1px solid var(--border); }
+
+/* ─── FAQ ─── */
+.faq { display:flex; flex-direction:column; gap:0; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+.faq-item { border-bottom:1px solid var(--border); }
+.faq-item:last-child { border-bottom:none; }
+.faq-q {
+  width:100%; text-align:left;
+  background:var(--bg2);
+  border:none;
+  padding:1rem 1.25rem;
+  color:var(--white);
+  font-family:'Inter',sans-serif;
+  font-size:0.9rem;
+  font-weight:600;
+  cursor:pointer;
+  display:flex; justify-content:space-between; align-items:center;
+  transition:background 0.2s;
+}
+.faq-q:hover { background:var(--bg3); }
+.faq-q.open { background:var(--bg3); color:var(--purple2); }
+.faq-arr { transition:transform 0.25s; font-size:0.75rem; color:var(--muted); }
+.faq-q.open .faq-arr { transform:rotate(180deg); color:var(--purple2); }
+.faq-a {
+  display:none;
+  padding:0.85rem 1.25rem 1.1rem;
+  color:var(--muted);
+  font-size:0.87rem;
+  line-height:1.7;
+  background:rgba(130,90,255,0.04);
+  border-top:1px solid var(--border);
+}
+.faq-a.open { display:block; }
+.faq-a code {
+  font-family:monospace;
+  background:rgba(130,90,255,0.12);
+  color:var(--purple2);
+  padding:0.1rem 0.4rem;
+  border-radius:4px;
+  font-size:0.9em;
+}
+
+/* ─── CHANGELOG ─── */
+.changelog { display:flex; flex-direction:column; gap:0; position:relative; padding-left:2.5rem; }
+.changelog::before {
+  content:''; position:absolute;
+  left:0.6rem; top:0; bottom:0;
+  width:1px; background:linear-gradient(to bottom, var(--purple), var(--blue), transparent);
+}
+.cl-entry { position:relative; padding-bottom:1.75rem; }
+.cl-dot {
+  position:absolute; left:-2rem; top:4px;
+  width:10px; height:10px;
+  border-radius:50%; background:var(--purple);
+  border:2px solid var(--bg);
+  box-shadow:0 0 8px var(--purple);
+}
+.cl-date { font-size:0.72rem; color:var(--muted); font-weight:600; margin-bottom:0.3rem; font-family:monospace; }
+.cl-title { font-weight:700; font-size:0.95rem; margin-bottom:0.3rem; }
+.cl-items { list-style:none; }
+.cl-items li {
+  font-size:0.83rem; color:var(--muted);
+  padding:0.15rem 0;
+  display:flex; gap:0.5rem;
+}
+.cl-items li::before { content:'+'; color:var(--green); flex-shrink:0; }
+.cl-items li.fix::before { content:'~'; color:var(--yellow); }
+.cl-items li.del::before { content:'-'; color:var(--red); }
+
+/* ─── TOAST ─── */
+#toast {
+  position:fixed; bottom:1.5rem; right:1.5rem;
+  background:var(--green); color:#000;
+  font-weight:700; font-size:0.85rem;
+  padding:0.65rem 1.25rem; border-radius:8px;
+  z-index:9999;
+  opacity:0; transform:translateY(8px);
+  transition:all 0.25s;
+  pointer-events:none;
+  font-family:'Press Start 2P',monospace;
+  font-size:0.55rem;
+}
+#toast.show { opacity:1; transform:translateY(0); }
+
+/* ─── FOOTER ─── */
+footer {
+  position:relative; z-index:1;
+  border-top:1px solid var(--border);
+  padding:1.5rem 2rem;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:1rem; flex-wrap:wrap;
+}
+.footer-left { display:flex; align-items:center; gap:1rem; }
+.footer-logo { font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--purple2); }
+.footer-ip { font-family:monospace; font-size:0.9rem; color:var(--muted); }
+.footer-right { font-size:0.78rem; color:rgba(255,255,255,0.2); }
+
+/* ─── MEDIA ─── */
+@media (max-width:768px) {
+  .hero { grid-template-columns:1fr; padding:5rem 1.25rem 2rem; }
+  .server-card { display:none; }
+  nav { padding:0 1.25rem; }
+  .nav-links { display:none; }
+  .wrap { padding:3rem 1.25rem; }
+  footer { flex-direction:column; align-items:flex-start; }
 }
 </style>
 </head>
 <body>
 
-<audio id="bg-music" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3"></audio>
+<div id="toast">Скопировано!</div>
 
-<!-- ГЛАВНОЕ МЕНЮ -->
-<div id="main-menu" class="screen active">
-  <div class="logo" id="main-logo">МАГАЗИН<br>МАЛОШКО</div>
-  <div class="subtitle">Idle Tycoon Edition</div>
-  <div class="menu-btns">
-    <button class="btn-menu" id="btn-continue" onclick="continueGame()" style="display:none">ПРОДОЛЖИТЬ</button>
-    <button class="btn-menu" onclick="newGame()">НОВАЯ ИГРА</button>
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">Maloshko SMP</a>
+  <ul class="nav-links">
+    <li><a href="#connect">Подключение</a></li>
+    <li><a href="#rules">Правила</a></li>
+    <li><a href="#join">Как зайти</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#changelog">Обновления</a></li>
+  </ul>
+  <div class="nav-status">
+    <div class="dot"></div>
+    Сервер онлайн
   </div>
-</div>
+</nav>
 
-<!-- ИГРОВОЙ ЭКРАН -->
-<div id="game-screen" class="screen">
-  <div class="hud">
-    <div class="hud-item"><span class="hud-label">Касса</span><span class="hud-value" id="ui-money">0.00 ₴</span></div>
-    <div class="hud-item"><span class="hud-label">Пассив</span><span class="hud-value green" id="ui-passive">+0.00 ₴/с</span></div>
-    <div class="hud-item"><span class="hud-label">Время</span><span class="hud-value" id="ui-time">Д1 08:00</span></div>
-    <div class="hud-btns">
-      <button class="btn-hud" onclick="toggleMusic()" id="btn-music">🎵 Выкл</button>
-      <button class="btn-hud btn-staff" onclick="openStaff()">👨‍💼 Персонал</button>
-      <button class="btn-hud btn-upg" onclick="openUpgrades()">🛠 Улучшения</button>
-      <button class="btn-hud btn-np" onclick="openNP()">📦 Склад НП</button>
-      <button class="btn-hud" onclick="openWholesale()">🛒 Заказ</button>
-      <button class="btn-hud" onclick="openNotebook()">📝 Долги</button>
-      <button class="btn-hud" onclick="saveAndExit()">Выход</button>
-    </div>
-  </div>
-
-  <div class="game-area">
-    <div class="alarm-light" id="alarm-light"></div>
-    <div class="shelves-container" id="shelves"></div>
-    
-    <div class="right-panel">
-      <div class="counter-area" id="counter-area">
-        <!-- Продавец -->
-        <div class="seller" id="seller">
-          <div class="bubble bubble-seller" id="bubble-seller">Слушаю вас!</div>
-          <img src="1.png" onerror="this.onerror=null; this.src='1.jpg'; this.onerror=function(){this.style.display='none'; document.getElementById('seller-svg').style.display='block';}" class="seller-img" id="seller-img">
-          <div id="seller-svg" style="display:none;">
-            <svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="35" fill="#3a5a3a"/><circle cx="40" cy="30" r="15" fill="#f4c68a"/><rect x="25" y="50" width="30" height="30" fill="#2a1808"/></svg>
-          </div>
-          <div class="seller-name">ПРОДАВЕЦ</div>
-        </div>
-
-        <!-- Покупатель -->
-        <div class="customer" id="customer">
-          <div class="bubble bubble-cust" id="bubble-cust">Здравствуйте!</div>
-          <div id="customer-svg"></div>
-        </div>
-        <div class="counter-desk"></div>
-      </div>
-
-      <div class="register-panel">
-        <div class="reg-info">
-          <div class="reg-col">
-            <div class="reg-row"><span>Запрос:</span> <span id="reg-req" style="color:var(--gold)">—</span></div>
-            <div class="reg-row"><span>Сумма:</span> <span id="reg-price">—</span></div>
-          </div>
-          <div class="reg-col">
-            <div class="reg-row"><span>Получено:</span> <span id="reg-given">—</span></div>
-            <div class="reg-row total" id="reg-result-row"><span>Сдача:</span> <span id="reg-change">—</span></div>
-          </div>
-        </div>
-        
-        <div class="btn-group">
-          <button class="btn btn-give" id="btn-give" onclick="processSale()">ВЫДАТЬ</button>
-          <button class="btn btn-out-of-stock" id="btn-out-of-stock" onclick="refuseOutOfStock()">НЕТ В НАЛИЧИИ</button>
-          <button class="btn btn-refuse" id="btn-refuse" onclick="refuseCustomer()">ОТКАЗАТЬ</button>
-          <button class="btn btn-debt" id="btn-debt" onclick="writeDebt()">В ДОЛГ</button>
-          <button class="btn btn-accept-debt" id="btn-accept-debt" onclick="acceptDebtRepayment()">ПРИНЯТЬ ДОЛГ</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- МОДАЛКИ -->
-<div class="modal-overlay" id="modal-staff">
-  <div class="modal">
-    <div class="modal-title" style="color:#ff9800">НАЙМ ПЕРСОНАЛА</div>
-    <div style="text-align:center; margin-bottom:10px; font-size:12px; color:var(--text-muted)">Сотрудники приносят пассивный доход каждую секунду.</div>
-    <div class="scroll-list" id="staff-list"></div>
-    <button class="btn-close" onclick="closeModal('modal-staff')">ЗАКРЫТЬ</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-upgrades">
-  <div class="modal">
-    <div class="modal-title" style="color:#673ab7">УЛУЧШЕНИЯ МАГАЗИНА</div>
-    <div class="scroll-list" id="upg-list"></div>
-    <button class="btn-close" onclick="closeModal('modal-upgrades')">ЗАКРЫТЬ</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-notebook">
-  <div class="modal">
-    <div class="modal-title">ТЕТРАДЬ ДОЛЖНИКОВ</div>
-    <div class="scroll-list" id="debt-list" style="background:var(--paper); color:#000; font-family:'Comic Sans MS', cursive;"></div>
-    <button class="btn-close" onclick="closeModal('modal-notebook')">ЗАКРЫТЬ</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-wholesale">
-  <div class="modal">
-    <div class="modal-title">ОПТОВАЯ БАЗА</div>
-    <div style="text-align:center; margin-bottom:10px; font-size:12px; color:var(--text-muted)">Доставка: 1 игровой час.</div>
-    <div class="scroll-list" id="ws-list"></div>
-    <button class="btn-close" onclick="closeModal('modal-wholesale')">ЗАКРЫТЬ</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-np">
-  <div class="modal">
-    <div class="modal-title" style="color:var(--np-red)">СКЛАД НОВОЙ ПОЧТЫ</div>
-    <div class="scroll-list" id="np-list"></div>
-    <button class="btn-close" onclick="closeModal('modal-np')">ЗАКРЫТЬ</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-signature">
-  <div class="modal" style="background:#e0e0e0; border-color:#333;">
-    <div class="modal-title" style="color:#333; font-family:sans-serif;">РАСПИШИТЕСЬ ЗА ПОЛУЧЕНИЕ</div>
-    <canvas id="sig-canvas" class="signature-pad"></canvas>
-    <div class="sig-controls">
-      <button class="btn btn-refuse" onclick="clearSignature()">ОЧИСТИТЬ</button>
-      <button class="btn btn-give" onclick="confirmSignature()">ПОДТВЕРДИТЬ</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-endday">
-  <div class="modal" style="text-align: center;">
-    <div class="modal-title" id="end-title">ДЕНЬ ЗАВЕРШЕН</div>
-    <div id="end-stats" style="margin: 15px 0; color: var(--text-muted); line-height: 1.6; font-size: 14px;"></div>
-    <button class="btn-menu" style="width: 100%; margin-top: 10px;" onclick="nextDay()">СЛЕДУЮЩИЙ ДЕНЬ</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-win">
-  <div class="modal" style="text-align: center; border-color: var(--accent-green);">
-    <div class="modal-title" style="color: var(--accent-green); font-size: 24px;">ПОБЕДА!</div>
-    <p style="margin: 15px 0; color: var(--text-main); line-height: 1.6;">
-      Вы выкупили помещение и стали полноправным владельцем магазина "Малошко"!<br><br>
-      Теперь вы настоящий бизнесмен. Вы можете продолжить играть в бесконечном режиме.
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-tag">▸ Vanilla SMP</div>
+    <h1 class="hero-title">Maloshko<br><span>SMP</span></h1>
+    <p class="hero-desc">
+      Ванильный выживач без модов и плагинов. Только ты, мир и другие игроки. Никакого доната, никакого Pay-to-Win.
     </p>
-    <button class="btn-menu" style="width: 100%; margin-top: 10px;" onclick="closeModal('modal-win')">ПРОДОЛЖИТЬ ИГРУ</button>
+    <div class="hero-ip-row" id="connect">
+      <div class="hero-ip-label">IP</div>
+      <div class="hero-ip-addr">maloshko.fun</div>
+      <button class="copy-btn" id="copyBtn" onclick="copyIP()">Копировать</button>
+    </div>
+    <div class="versions-row">
+      <span class="vtag">Java 1.20.x</span>
+      <span class="vtag">Java 1.21.1</span>
+      <span class="vtag">Ванила</span>
+    </div>
+  </div>
+
+  <!-- Fake Minecraft server status card -->
+  <div class="server-card">
+    <div class="server-card-header">
+      <div class="server-icon">🧱</div>
+      <div>
+        <div class="server-name">Maloshko SMP</div>
+        <div class="server-host">maloshko.fun · 25565</div>
+      </div>
+    </div>
+    <div class="server-motd">
+      <span class="motd-purple">▌ Maloshko <span class="motd-blue">SMP</span></span>
+      <span class="motd-gray">· Ваниль · 1.20 — 1.21.1 · без доната ·</span>
+    </div>
+    <div class="server-stats">
+      <div class="stat">
+        <div class="stat-val green">●&nbsp;Онлайн</div>
+        <div class="stat-label">Статус</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val purple">4 / 20</div>
+        <div class="stat-label">Игроков</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val blue">18ms</div>
+        <div class="stat-label">Пинг</div>
+      </div>
+    </div>
+    <div class="server-players">
+      <div class="players-title">Сейчас онлайн</div>
+      <div class="players-list">
+        <div class="player-tag p-green">Малошко</div>
+        <div class="player-tag p-blue">Steve_dev</div>
+        <div class="player-tag p-yellow">Notch_fan</div>
+        <div class="player-tag p-purple">XxCreeperxX</div>
+      </div>
+    </div>
+    <div class="server-ping">
+      <div class="ping-bars">
+        <div class="ping-bar" style="height:4px"></div>
+        <div class="ping-bar" style="height:7px"></div>
+        <div class="ping-bar" style="height:10px"></div>
+        <div class="ping-bar" style="height:14px"></div>
+      </div>
+      Хорошее соединение · 18ms
+    </div>
   </div>
 </div>
 
-<div class="toast" id="toast">Сообщение</div>
+<hr class="divider">
+
+<!-- RULES -->
+<div class="wrap" id="rules">
+  <div class="sec-head">
+    <div class="sec-tag">// Правила</div>
+    <h2 class="sec-title">Правила сервера</h2>
+    <p class="sec-sub">Нарушение — бан без предупреждений. Читай внимательно.</p>
+  </div>
+  <div class="rules-grid">
+    <div class="rule">
+      <div class="rule-n">01</div>
+      <div class="rule-body">
+        <h4>Никаких читов</h4>
+        <p>Запрещены любые клиенты и моды, дающие нечестное преимущество: X-Ray, килауры, speedhack, flymod и т.д.</p>
+        <span class="rule-tag tag-ban">Перманент</span>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">02</div>
+      <div class="rule-body">
+        <h4>Гриферство запрещено</h4>
+        <p>Нельзя ломать, поджигать и взрывать чужие постройки. Воровство из сундуков тоже запрещено.</p>
+        <span class="rule-tag tag-ban">Перманент</span>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">03</div>
+      <div class="rule-body">
+        <h4>PvP без согласия</h4>
+        <p>Убивать игроков без их согласия запрещено. Исключение — специально обозначенные PvP-зоны.</p>
+        <span class="rule-tag tag-ban">Бан / откат</span>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">04</div>
+      <div class="rule-body">
+        <h4>Нормальное общение</h4>
+        <p>Оскорбления, расизм, угрозы и целенаправленная токсичность — запрещены.</p>
+        <span class="rule-tag tag-warn">Mute → Бан</span>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">05</div>
+      <div class="rule-body">
+        <h4>Не лагай сервер</h4>
+        <p>Лагосборники, бесконечные фермы мобов без ограничений, нагруженный редстоун — запрещены.</p>
+        <span class="rule-tag tag-warn">Снос → Бан</span>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">06</div>
+      <div class="rule-body">
+        <h4>Строй дальше от спавна</h4>
+        <p>Минимум 500 блоков от нулевых координат. Не занимай весь спавн под себя.</p>
+        <span class="rule-tag tag-info">Рекомендация</span>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">07</div>
+      <div class="rule-body">
+        <h4>Уважай решения адмнов</h4>
+        <p>Решение администраторов окончательное. Споры — в личку, не в общий чат.</p>
+        <span class="rule-tag tag-info">Важно</span>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="rule-n">08</div>
+      <div class="rule-body">
+        <h4>Один аккаунт</h4>
+        <p>Зайти с нескольких аккаунтов для обхода бана — перманентный бан всех аккаунтов.</p>
+        <span class="rule-tag tag-ban">Перманент</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- HOW TO JOIN -->
+<div class="wrap" id="join">
+  <div class="sec-head">
+    <div class="sec-tag">// Подключение</div>
+    <h2 class="sec-title">Как зайти на сервер</h2>
+    <p class="sec-sub">Поддерживается лицензионный Minecraft Java Edition.</p>
+  </div>
+  <table class="join-table">
+    <tbody>
+      <tr>
+        <td class="join-step-num">01</td>
+        <td>
+          <div class="join-step-title">Запусти Minecraft</div>
+          <div class="join-step-desc">Открой лаунчер, выбери профиль с версией <span class="join-step-code">1.20.x</span> или <span class="join-step-code">1.21.1</span> и нажми «Играть».</div>
+        </td>
+      </tr>
+      <tr>
+        <td class="join-step-num">02</td>
+        <td>
+          <div class="join-step-title">Открой «Мультиплеер»</div>
+          <div class="join-step-desc">В главном меню: <span class="join-step-code">Мультиплеер</span> → <span class="join-step-code">Добавить сервер</span>.</div>
+        </td>
+      </tr>
+      <tr>
+        <td class="join-step-num">03</td>
+        <td>
+          <div class="join-step-title">Введи адрес</div>
+          <div class="join-step-desc">В поле «Адрес сервера» вставь <span class="join-step-code">maloshko.fun</span> — порт указывать не нужно (стандартный 25565).</div>
+        </td>
+      </tr>
+      <tr>
+        <td class="join-step-num">04</td>
+        <td>
+          <div class="join-step-title">Подключись и играй</div>
+          <div class="join-step-desc">Нажми «Готово», дважды кликни по серверу в списке. При первом входе ты появишься на спавне — найди себе место минимум в 500 блоках от нуля.</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<hr class="divider">
+
+<!-- FAQ -->
+<div class="wrap" id="faq">
+  <div class="sec-head">
+    <div class="sec-tag">// FAQ</div>
+    <h2 class="sec-title">Частые вопросы</h2>
+  </div>
+  <div class="faq">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Сервер ванильный или есть плагины?
+        <span class="faq-arr">▼</span>
+      </button>
+      <div class="faq-a">
+        Сервер 100% ванильный — никаких плагинов, модов или изменённых механик. Только стандартный <code>vanilla server.jar</code> от Mojang. Фермы, механики и редстоун работают ровно так, как задумано разработчиками.
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Работает ли сервер с Bedrock Edition?
+        <span class="faq-arr">▼</span>
+      </button>
+      <div class="faq-a">
+        Нет. Сервер работает только с <code>Java Edition</code>. Bedrock (Windows 10/мобилки/консоли) не поддерживается. Нужна лицензионная Java-версия 1.20+ или 1.21.1.
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Бывают ли вайпы карты?
+        <span class="faq-arr">▼</span>
+      </button>
+      <div class="faq-a">
+        Вайп карты — крайняя мера, делается только при переходе на новую версию Minecraft с несовместимой генерацией. О вайпе объявляется заранее в дискорде за 2+ недели.
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Сколько стоит донат?
+        <span class="faq-arr">▼</span>
+      </button>
+      <div class="faq-a">
+        Доната нет. Никаких привилегий за деньги. Все игроки в равных условиях. Сервер держится без платного доступа.
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Как сообщить о нарушителе?
+        <span class="faq-arr">▼</span>
+      </button>
+      <div class="faq-a">
+        Сделай скриншот или запись, и напиши в личку администратору. Репорты без доказательств не рассматриваются. Главное — ник нарушителя и описание ситуации.
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Можно ли использовать Optifine / Sodium?
+        <span class="faq-arr">▼</span>
+      </button>
+      <div class="faq-a">
+        Да. Оптимизационные клиентские моды (<code>Optifine</code>, <code>Sodium</code>, <code>Lithium</code>, <code>Iris</code>) — разрешены. Запрещены только моды, дающие игровое преимущество (X-Ray, aimbot, speedhack).
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Лимит игроков онлайн?
+        <span class="faq-arr">▼</span>
+      </button>
+      <div class="faq-a">
+        Лимит слотов — 20 игроков. Сервер расчитан на небольшое сообщество, где все друг друга знают. При росте комьюнити лимит может быть увеличен.
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- CHANGELOG -->
+<div class="wrap" id="changelog">
+  <div class="sec-head">
+    <div class="sec-tag">// Обновления</div>
+    <h2 class="sec-title">История изменений</h2>
+    <p class="sec-sub">Что менялось на сервере</p>
+  </div>
+  <div class="changelog">
+    <div class="cl-entry">
+      <div class="cl-dot"></div>
+      <div class="cl-date">Июнь 2025</div>
+      <div class="cl-title">Обновление 1.21.1</div>
+      <ul class="cl-items">
+        <li>Добавлена поддержка Minecraft 1.21.1</li>
+        <li>Обновлён сайт</li>
+        <li class="fix">Исправлен баг с телепортацией в Энд</li>
+      </ul>
+    </div>
+    <div class="cl-entry">
+      <div class="cl-dot"></div>
+      <div class="cl-date">Март 2025</div>
+      <div class="cl-title">Правила и модерация</div>
+      <ul class="cl-items">
+        <li>Добавлено правило про мультиаккаунты</li>
+        <li>Уточнена зона вокруг спавна (500 блоков)</li>
+        <li class="fix">Снижена нагрузка от стартовой зоны</li>
+      </ul>
+    </div>
+    <div class="cl-entry">
+      <div class="cl-dot"></div>
+      <div class="cl-date">Декабрь 2024</div>
+      <div class="cl-title">Поддержка 1.20</div>
+      <ul class="cl-items">
+        <li>Сервер переехал на 1.20</li>
+        <li>Обновлена карта — добавлены новые биомы</li>
+        <li class="del">Убран временный ивентовый мир</li>
+      </ul>
+    </div>
+    <div class="cl-entry">
+      <div class="cl-dot"></div>
+      <div class="cl-date">Сентябрь 2024</div>
+      <div class="cl-title">Запуск сервера</div>
+      <ul class="cl-items">
+        <li>Сервер запущен на версии 1.19.4</li>
+        <li>Создан сайт maloshko.fun</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">
+    <div class="footer-logo">Maloshko SMP</div>
+    <div class="footer-ip">maloshko.fun</div>
+  </div>
+  <div class="footer-right">Не связан с Mojang / Microsoft · Java Edition only</div>
+</footer>
 
 <script>
-// === БАЗА ДАННЫХ ===
-const PRODS_BASIC = [
-  { id: 'bread', name: 'Хлеб', price: 0.30, wsPrice: 0.15, svg: '<rect x="4" y="10" width="32" height="20" rx="10" fill="#d4a373"/>' },
-  { id: 'milk', name: 'Молоко', price: 0.40, wsPrice: 0.20, svg: '<rect x="10" y="10" width="20" height="25" fill="#fefae0"/><polygon points="10,10 20,2 30,10" fill="#0077b6"/>' },
-  { id: 'sugar', name: 'Сахар', price: 0.55, wsPrice: 0.30, svg: '<rect x="8" y="12" width="24" height="24" rx="2" fill="#e9edc9"/>' },
-  { id: 'salt', name: 'Соль', price: 0.20, wsPrice: 0.10, svg: '<rect x="10" y="10" width="20" height="26" rx="2" fill="#ffffff"/>' },
-  { id: 'sausage', name: 'Колбаса', price: 1.20, wsPrice: 0.70, svg: '<rect x="6" y="15" width="28" height="10" rx="5" fill="#9e2a2b"/>' },
-  { id: 'cheese', name: 'Сыр', price: 1.50, wsPrice: 0.80, svg: '<polygon points="10,30 30,30 20,10" fill="#ffb703"/>' },
-  { id: 'cola', name: 'Кола', price: 0.80, wsPrice: 0.40, svg: '<rect x="14" y="8" width="12" height="28" rx="3" fill="#333"/><rect x="14" y="15" width="12" height="8" fill="#e63946"/>' },
-  { id: 'chips', name: 'Чипсы', price: 0.90, wsPrice: 0.45, svg: '<rect x="8" y="8" width="24" height="28" rx="4" fill="#f4a261"/>' },
-  { id: 'canned', name: 'Тушёнка', price: 0.90, wsPrice: 0.50, svg: '<rect x="8" y="12" width="24" height="16" rx="3" fill="#606c38"/>' },
-  { id: 'vodka', name: 'Водка', price: 2.80, wsPrice: 1.50, svg: '<rect x="14" y="12" width="12" height="24" rx="2" fill="#a8dadc"/>' },
-  { id: 'cigarettes', name: 'Сигареты', price: 0.35, wsPrice: 0.15, svg: '<rect x="10" y="8" width="20" height="26" fill="#dda15e"/>' }
-];
-
-const PRODS_PREMIUM = [
-  { id: 'caviar', name: 'Красная Икра', price: 15.00, wsPrice: 8.00, svg: '<circle cx="20" cy="20" r="12" fill="#d00000"/><circle cx="20" cy="20" r="8" fill="#ffba08" opacity="0.5"/>' },
-  { id: 'cognac', name: 'Коньяк XO', price: 25.00, wsPrice: 12.00, svg: '<rect x="12" y="15" width="16" height="20" rx="4" fill="#6f1d1b"/><rect x="16" y="5" width="8" height="10" fill="#6f1d1b"/>' },
-  { id: 'jamon', name: 'Хамон', price: 35.00, wsPrice: 18.00, svg: '<path d="M10,30 Q20,10 35,15 Q30,35 10,30" fill="#9e2a2b"/>' }
-];
-
-const CUSTOMERS = [
-  { type: 'granny', names: ['Баба Нюра', 'Тетя Галя'], color: '#9c6644' },
-  { type: 'man', names: ['Дядя Вася', 'Петрович'], color: '#2a9d8f' },
-  { type: 'woman', names: ['Светлана', 'Мария'], color: '#e76f51' },
-  { type: 'child', names: ['Вовка', 'Маша'], color: '#457b9d' }
-];
-
-const STAFF_TIERS = {
-  t1: { name: 'Стажер', cost: 1, income: 0.20, max: 3 },
-  t2: { name: 'Опытный кассир', cost: 100, income: 60, max: 3 },
-  t3: { name: 'Топ-менеджер', cost: 60000, income: 2000000, max: 3 }
-};
-
-// === СОСТОЯНИЕ ИГРЫ ===
-let G = { 
-  money: 20.00, score: 0, day: 1, time: 8 * 60, stock: {}, debts: [], deliveries: [], np_parcels: [],
-  upgrades: { fridge: false, neon: false, alarm: false, won: false },
-  workers: { t1: 0, t2: 0, t3: 0 }
-};
-let clockInterval, customerTimeout;
-let currentCustomer = null;
-let selectedProduct = null;
-let isDayActive = false;
-let isMusicPlaying = false;
-
-// === ИНИЦИАЛИЗАЦИЯ ===
-window.onload = () => { if (localStorage.getItem('maloshko_save')) document.getElementById('btn-continue').style.display = 'block'; };
-
-function toggleMusic() {
-  const audio = document.getElementById('bg-music');
-  const btn = document.getElementById('btn-music');
-  if (isMusicPlaying) { audio.pause(); btn.textContent = '🎵 Выкл'; } 
-  else { audio.play().catch(()=>{}); btn.textContent = '🎵 Вкл'; }
-  isMusicPlaying = !isMusicPlaying;
-}
-
-function newGame() {
-  G = { money: 20.00, score: 0, day: 1, time: 8 * 60, stock: {}, debts: [], deliveries: [], np_parcels: [], upgrades: { fridge: false, neon: false, alarm: false, won: false }, workers: { t1: 0, t2: 0, t3: 0 } };
-  PRODS_BASIC.forEach(p => G.stock[p.id] = 10);
-  startGame();
-}
-
-function continueGame() {
-  const saved = JSON.parse(localStorage.getItem('maloshko_save'));
-  if (saved) { 
-    // Умное слияние старого сейва с новыми переменными
-    G = { ...G, ...saved };
-    if(!G.upgrades) G.upgrades = { fridge: false, neon: false, alarm: false, won: false };
-    if(!G.workers) G.workers = { t1: 0, t2: 0, t3: 0 };
-    if(!G.np_parcels) G.np_parcels = [];
-    if(!G.deliveries) G.deliveries = [];
-    if(!G.debts) G.debts = [];
-    if(!G.stock) G.stock = {};
-    
-    // Восстанавливаем товары, если их не было в старом сейве
-    PRODS_BASIC.forEach(p => { if(G.stock[p.id] === undefined) G.stock[p.id] = 10; });
-    PRODS_PREMIUM.forEach(p => { if(G.stock[p.id] === undefined) G.stock[p.id] = 0; });
-
-    startGame(); 
-  }
-}
-
-function saveGame() { localStorage.setItem('maloshko_save', JSON.stringify(G)); }
-
-function saveAndExit() {
-  saveGame(); isDayActive = false; clearInterval(clockInterval); clearTimeout(customerTimeout);
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('main-menu').classList.add('active');
-  if (localStorage.getItem('maloshko_save')) document.getElementById('btn-continue').style.display = 'block';
-}
-
-function startGame() {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('game-screen').classList.add('active');
-  isDayActive = true;
-  if(!isMusicPlaying) toggleMusic();
-  applyVisualUpgrades();
-  updateHUD(); renderShelves();
-  clockInterval = setInterval(tickTime, 1000);
-  scheduleNextCustomer();
-}
-
-function applyVisualUpgrades() {
-  if (G.upgrades.neon) document.getElementById('main-logo').classList.add('neon-active');
-  if (G.upgrades.alarm) document.getElementById('alarm-light').classList.add('active');
-}
-
-function getActiveProds() { return G.upgrades.fridge ? [...PRODS_BASIC, ...PRODS_PREMIUM] : PRODS_BASIC; }
-
-// === ОТРИСОВКА ===
-function getCustomerSVG(color) { return `<svg width="100" height="120" viewBox="0 0 100 120"><path d="M20,120 L20,60 Q20,40 50,40 Q80,40 80,60 L80,120 Z" fill="${color}" stroke="#000" stroke-width="2"/><circle cx="50" cy="30" r="20" fill="#ffcdb2" stroke="#000" stroke-width="2"/><circle cx="43" cy="28" r="2" fill="#000"/><circle cx="57" cy="28" r="2" fill="#000"/></svg>`; }
-
-function updateHUD() {
-  document.getElementById('ui-money').textContent = G.money.toFixed(2) + ' ₴';
-  document.getElementById('ui-score').textContent = G.score;
-  let h = Math.floor(G.time / 60), m = G.time % 60;
-  document.getElementById('ui-time').textContent = `Д${G.day} ${(h<10?'0'+h:h)}:${(m<10?'0'+m:m)}`;
-  
-  let passive = (G.workers.t1 * STAFF_TIERS.t1.income) + (G.workers.t2 * STAFF_TIERS.t2.income) + (G.workers.t3 * STAFF_TIERS.t3.income);
-  document.getElementById('ui-passive').textContent = `+${passive.toFixed(2)} ₴/с`;
-}
-
-function renderShelves() {
-  const container = document.getElementById('shelves');
-  container.innerHTML = '';
-  
-  const basicProds = PRODS_BASIC.filter(p => G.stock[p.id] > 0);
-  for(let i = 0; i < basicProds.length; i += 5) {
-    const shelf = document.createElement('div'); shelf.className = 'shelf';
-    basicProds.slice(i, i + 5).forEach(p => {
-      const el = document.createElement('div'); el.className = 'product'; el.id = 'prod-' + p.id; el.onclick = () => selectProduct(p.id);
-      el.innerHTML = `<div class="prod-qty">${G.stock[p.id]}</div><svg width="40" height="40" viewBox="0 0 40 40">${p.svg}</svg><div class="prod-name">${p.name}</div>`;
-      shelf.appendChild(el);
-    });
-    container.appendChild(shelf);
-  }
-
-  if (G.upgrades.fridge) {
-    const premProds = PRODS_PREMIUM.filter(p => G.stock[p.id] > 0);
-    if (premProds.length > 0) {
-      const fridgeShelf = document.createElement('div'); fridgeShelf.className = 'shelf fridge';
-      premProds.forEach(p => {
-        const el = document.createElement('div'); el.className = 'product'; el.id = 'prod-' + p.id; el.onclick = () => selectProduct(p.id);
-        el.innerHTML = `<div class="prod-qty">${G.stock[p.id]}</div><svg width="40" height="40" viewBox="0 0 40 40">${p.svg}</svg><div class="prod-name">${p.name}</div>`;
-        fridgeShelf.appendChild(el);
-      });
-      container.appendChild(fridgeShelf);
-    }
-  }
-}
-
-// === АНИМАЦИЯ РАЗГОВОРА ===
-function speakText(who, text) {
-  const bubble = document.getElementById(`bubble-${who}`);
-  const charId = who === 'cust' ? 'customer' : 'seller';
-  const char = document.getElementById(charId);
-  
-  bubble.textContent = text;
-  bubble.classList.add('show');
-  if(char) char.classList.add('talking');
-  
-  setTimeout(() => {
-    bubble.classList.remove('show');
-    if(char) char.classList.remove('talking');
-  }, 2500);
-}
-
-// === ЛОГИКА КЛИЕНТОВ ===
-function scheduleNextCustomer() {
-  if (!isDayActive) return;
-  let delay = Math.random() * 3000 + 2000;
-  if (G.upgrades.neon) delay *= 0.6; 
-  customerTimeout = setTimeout(spawnCustomer, delay);
-}
-
-function spawnCustomer() {
-  if (!isDayActive) return;
-  
-  const cType = CUSTOMERS[Math.floor(Math.random() * CUSTOMERS.length)];
-  const name = cType.names[Math.floor(Math.random() * cType.names.length)];
-  document.getElementById('customer-svg').innerHTML = getCustomerSVG(cType.color);
-  
-  const rand = Math.random();
-  
-  if (G.np_parcels.length > 0 && rand < 0.15) {
-    const parcel = G.np_parcels[Math.floor(Math.random() * G.np_parcels.length)];
-    currentCustomer = { type: 'np', name: name, parcel: parcel };
-    speakText('cust', `Здравствуйте, я за посылкой. Номер: ${parcel.id}`);
-    setupRegisterUI(`Посылка #${parcel.id}`, parcel.price, parcel.price, 0, 'np');
-  } 
-  else if (G.debts.length > 0 && rand < 0.30) {
-    const debtIndex = Math.floor(Math.random() * G.debts.length);
-    const debt = G.debts[debtIndex];
-    currentCustomer = { type: 'repay', name: debt.name, amount: debt.amount, index: debtIndex };
-    speakText('cust', `Я долг принес! Вот ${debt.amount.toFixed(2)} ₴.`);
-    setupRegisterUI('Возврат долга', '—', debt.amount, 0, 'repay');
-  } 
-  else {
-    const prods = getActiveProds();
-    if(prods.length === 0) {
-        // Если вообще нет товаров в базе (не должно быть, но на всякий случай)
-        scheduleNextCustomer();
-        return;
-    }
-    const prod = prods[Math.floor(Math.random() * prods.length)];
-    let qty = Math.floor(Math.pow(Math.random(), 2) * 9) + 1; 
-    const totalCost = parseFloat((prod.price * qty).toFixed(2));
-    
-    let isShort = Math.random() < 0.15;
-    let moneyGiven = isShort ? parseFloat((totalCost * (Math.random() * 0.5 + 0.2)).toFixed(2)) : parseFloat((totalCost + [0, 1, 5, 10][Math.floor(Math.random()*4)]).toFixed(2));
-    if(moneyGiven < totalCost && !isShort) moneyGiven = totalCost;
-
-    const outOfStock = !G.stock[prod.id] || G.stock[prod.id] < qty;
-
-    currentCustomer = { type: 'buy', name: name, product: prod, qty: qty, totalCost: totalCost, money: moneyGiven, isShort: isShort, debtAmount: isShort ? totalCost - moneyGiven : 0, outOfStock: outOfStock };
-    
-    let phrase = isShort ? `Дай ${prod.name} (${qty} шт). У меня только ${moneyGiven.toFixed(2)} ₴... Запишешь?` : `Мне нужно ${prod.name}, ${qty} шт. Вот ${moneyGiven.toFixed(2)} ₴.`;
-    speakText('cust', phrase);
-    
-    setupRegisterUI(`${prod.name} x${qty}`, totalCost, moneyGiven, isShort ? currentCustomer.debtAmount : moneyGiven - totalCost, outOfStock ? 'out' : (isShort ? 'short' : 'normal'));
-  }
-  
-  selectedProduct = null;
-  document.querySelectorAll('.product').forEach(el => el.classList.remove('selected'));
-  document.getElementById('customer').classList.add('visible');
-}
-
-function setupRegisterUI(req, price, given, change, mode) {
-  document.getElementById('reg-req').textContent = req;
-  document.getElementById('reg-price').textContent = price !== '—' ? price.toFixed(2) + ' ₴' : '—';
-  document.getElementById('reg-given').textContent = given.toFixed(2) + ' ₴';
-  
-  const resRow = document.getElementById('reg-result-row');
-  const resVal = document.getElementById('reg-change');
-  
-  ['btn-give', 'btn-refuse', 'btn-debt', 'btn-accept-debt', 'btn-out-of-stock'].forEach(id => {
-    let el = document.getElementById(id);
-    el.style.display = 'none';
-    el.disabled = false; 
+function copyIP() {
+  navigator.clipboard.writeText('maloshko.fun').then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Скопировано!';
+    btn.classList.add('copied');
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => { t.classList.remove('show'); btn.textContent = 'Копировать'; btn.classList.remove('copied'); }, 2000);
   });
-
-  if (mode === 'repay') {
-    resRow.className = 'reg-row total'; resRow.querySelector('span').textContent = 'К зачислению:'; resVal.textContent = given.toFixed(2) + ' ₴';
-    document.getElementById('btn-accept-debt').style.display = 'block';
-  } else if (mode === 'out') {
-    resRow.className = 'reg-row total debt-warn'; resRow.querySelector('span').textContent = 'Статус:'; resVal.textContent = 'НЕТ ТОВАРА';
-    document.getElementById('btn-out-of-stock').style.display = 'block';
-  } else if (mode === 'short') {
-    resRow.className = 'reg-row total debt-warn'; resRow.querySelector('span').textContent = 'Не хватает:'; resVal.textContent = change.toFixed(2) + ' ₴';
-    document.getElementById('btn-debt').style.display = 'block'; document.getElementById('btn-refuse').style.display = 'block';
-    document.getElementById('btn-debt').disabled = true; 
-  } else if (mode === 'np') {
-    resRow.className = 'reg-row total'; resRow.querySelector('span').textContent = 'Оплата НП:'; resVal.textContent = given.toFixed(2) + ' ₴';
-    document.getElementById('btn-give').style.display = 'block'; document.getElementById('btn-refuse').style.display = 'block';
-    document.getElementById('btn-give').disabled = true; 
-  } else {
-    resRow.className = 'reg-row total'; resRow.querySelector('span').textContent = 'Сдача:'; resVal.textContent = change.toFixed(2) + ' ₴';
-    document.getElementById('btn-give').style.display = 'block'; document.getElementById('btn-refuse').style.display = 'block';
-    document.getElementById('btn-give').disabled = true; 
-  }
 }
 
-function selectProduct(id) {
-  if (!currentCustomer || currentCustomer.type !== 'buy') return;
-  selectedProduct = id;
-  document.querySelectorAll('.product').forEach(el => { el.classList.remove('selected'); if (el.id === 'prod-' + id) el.classList.add('selected'); });
-  
-  if (G.stock[id] >= currentCustomer.qty) {
-    document.getElementById('btn-give').disabled = false;
-    document.getElementById('btn-debt').disabled = false;
-  }
+function toggleFaq(btn) {
+  const ans = btn.nextElementSibling;
+  const isOpen = btn.classList.contains('open');
+  document.querySelectorAll('.faq-q.open').forEach(b => { b.classList.remove('open'); b.nextElementSibling.classList.remove('open'); });
+  if (!isOpen) { btn.classList.add('open'); ans.classList.add('open'); }
 }
-
-// === ТРАНЗАКЦИИ ===
-function processSale() {
-  if (currentCustomer.type === 'np') {
-    if(selectedProduct !== currentCustomer.parcel.id) { showToast("Выберите правильную посылку на складе НП!"); return; }
-    openSignaturePad(); return;
-  }
-  if (selectedProduct !== currentCustomer.product.id) { showToast("Это не тот товар!"); G.score = Math.max(0, G.score - 5); updateHUD(); return; }
-  
-  G.money += currentCustomer.totalCost; G.score += 10; G.stock[selectedProduct] -= currentCustomer.qty;
-  finishTransaction("Спасибо за покупку!");
-}
-
-function writeDebt() {
-  if (selectedProduct !== currentCustomer.product.id) { showToast("Это не тот товар!"); return; }
-  G.money += currentCustomer.money; G.score += 15; G.stock[selectedProduct] -= currentCustomer.qty;
-  G.debts.push({ name: currentCustomer.name, amount: currentCustomer.debtAmount });
-  finishTransaction("Записал в тетрадь. Не забудь вернуть!");
-}
-
-function acceptDebtRepayment() {
-  G.money += currentCustomer.amount; G.score += 5; G.debts.splice(currentCustomer.index, 1);
-  finishTransaction("Отлично, вычеркиваю из тетради!");
-}
-
-function refuseOutOfStock() { finishTransaction("Извините, сейчас нет в наличии. Приходите позже, я закажу."); }
-function refuseCustomer() { G.score = Math.max(0, G.score - 2); finishTransaction("Извините, ничем не могу помочь."); }
-
-function finishTransaction(msg) {
-  speakText('seller', msg);
-  updateHUD(); renderShelves(); saveGame();
-  ['btn-give', 'btn-debt', 'btn-accept-debt', 'btn-out-of-stock'].forEach(id => document.getElementById(id).disabled = true);
-  
-  setTimeout(() => {
-    document.getElementById('customer').classList.remove('visible');
-    currentCustomer = null;
-    setupRegisterUI('—', '—', 0, 0, 'normal');
-    scheduleNextCustomer();
-  }, 2500);
-}
-
-// === НОВАЯ ПОЧТА ===
-function generateNPParcel() {
-  const id = Math.floor(10000 + Math.random() * 90000).toString();
-  const price = Math.floor(Math.random() * 1500) + 500;
-  G.np_parcels.push({ id: id, price: price });
-  showToast(`🚚 Приехала машина Новой Почты! (Посылка #${id})`);
-}
-
-function openNP() {
-  const list = document.getElementById('np-list'); list.innerHTML = '';
-  if(G.np_parcels.length === 0) { list.innerHTML = '<div style="text-align:center; color:#888;">Склад пуст.</div>'; }
-  else {
-    G.np_parcels.forEach(p => {
-      const btn = document.createElement('button'); btn.className = 'btn-action'; btn.textContent = 'ВЫБРАТЬ';
-      btn.onclick = () => {
-        selectedProduct = p.id; showToast(`Выбрана посылка #${p.id}`); closeModal('modal-np');
-        if(currentCustomer && currentCustomer.type === 'np' && currentCustomer.parcel.id === p.id) document.getElementById('btn-give').disabled = false;
-      };
-      const item = document.createElement('div'); item.className = 'list-item';
-      item.innerHTML = `<div><b>Посылка #${p.id}</b><br><span style="font-size:11px; color:var(--accent-green)">Наложенный платеж: ${p.price} ₴</span></div>`;
-      item.appendChild(btn); list.appendChild(item);
-    });
-  }
-  document.getElementById('modal-np').classList.add('active');
-}
-
-// === ХОЛСТ ДЛЯ ПОДПИСИ ===
-const canvas = document.getElementById('sig-canvas');
-const ctx = canvas.getContext('2d');
-let isDrawing = false;
-
-function resizeCanvas() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.strokeStyle = '#000080'; }
-window.addEventListener('resize', resizeCanvas);
-
-function startPos(e) { isDrawing = true; draw(e); }
-function endPos() { isDrawing = false; ctx.beginPath(); }
-function draw(e) {
-  if (!isDrawing) return; e.preventDefault();
-  let x = e.clientX || e.touches[0].clientX; let y = e.clientY || e.touches[0].clientY;
-  const rect = canvas.getBoundingClientRect(); x -= rect.left; y -= rect.top;
-  ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y);
-}
-
-canvas.addEventListener('mousedown', startPos); canvas.addEventListener('mouseup', endPos); canvas.addEventListener('mousemove', draw);
-canvas.addEventListener('touchstart', startPos, {passive:false}); canvas.addEventListener('touchend', endPos); canvas.addEventListener('touchmove', draw, {passive:false});
-
-function openSignaturePad() { document.getElementById('modal-signature').classList.add('active'); setTimeout(resizeCanvas, 100); }
-function clearSignature() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-function confirmSignature() {
-  closeModal('modal-signature'); clearSignature();
-  G.money += currentCustomer.parcel.price; G.score += 20;
-  G.np_parcels = G.np_parcels.filter(p => p.id !== currentCustomer.parcel.id);
-  finishTransaction("Посылка выдана. Спасибо, что пользуетесь Новой Почтой!");
-}
-
-// === ПАССИВНЫЙ ДОХОД И ВРЕМЯ ===
-function showFloatingIncome(amount) {
-  const el = document.createElement('div');
-  el.className = 'floating-income';
-  el.textContent = `+${amount.toFixed(2)} ₴`;
-  document.getElementById('counter-area').appendChild(el);
-  setTimeout(() => el.remove(), 1500);
-}
-
-function tickTime() {
-  G.time++; 
-  
-  let passive = (G.workers.t1 * STAFF_TIERS.t1.income) + (G.workers.t2 * STAFF_TIERS.t2.income) + (G.workers.t3 * STAFF_TIERS.t3.income);
-  if (passive > 0) {
-    G.money += passive;
-    showFloatingIncome(passive);
-  }
-  
-  updateHUD();
-  
-  for (let i = G.deliveries.length - 1; i >= 0; i--) {
-    if (G.time >= G.deliveries[i].time) {
-      if(!G.stock[G.deliveries[i].id]) G.stock[G.deliveries[i].id] = 0;
-      G.stock[G.deliveries[i].id] += 10;
-      showToast(`📦 Доставлено: ${getActiveProds().find(p=>p.id===G.deliveries[i].id).name} (10 шт)`);
-      G.deliveries.splice(i, 1); renderShelves(); saveGame();
-    }
-  }
-
-  if (Math.random() < 0.002) generateNPParcel();
-  if (G.time >= 20 * 60) endDay();
-}
-
-function endDay() {
-  isDayActive = false; clearInterval(clockInterval); clearTimeout(customerTimeout);
-  document.getElementById('customer').classList.remove('visible');
-  
-  let rent = 20 + (G.day * 5); 
-  let stolen = 0;
-  
-  if (!G.upgrades.alarm && Math.random() < 0.3) {
-    stolen = Math.floor(G.money * 0.1); 
-    G.money -= stolen;
-  }
-  
-  G.money -= rent;
-  if(G.money < 0) G.money = 0;
-
-  let statsHtml = `Заработано: <b style="color:var(--gold)">${G.money.toFixed(2)} ₴</b><br>`;
-  statsHtml += `Оплата аренды: <b style="color:var(--accent-red)">-${rent.toFixed(2)} ₴</b><br>`;
-  if (stolen > 0) statsHtml += `Ночная кража: <b style="color:var(--accent-red)">-${stolen.toFixed(2)} ₴</b> (Купите сигнализацию!)<br>`;
-  
-  document.getElementById('end-stats').innerHTML = statsHtml;
-  document.getElementById('modal-endday').classList.add('active');
-  saveGame();
-}
-
-function nextDay() { G.day++; G.time = 8 * 60; document.getElementById('modal-endday').classList.remove('active'); startGame(); }
-
-// === ПЕРСОНАЛ ===
-function openStaff() {
-  const list = document.getElementById('staff-list'); list.innerHTML = '';
-  
-  Object.keys(STAFF_TIERS).forEach(key => {
-    const t = STAFF_TIERS[key];
-    const currentCount = G.workers[key];
-    
-    const btn = document.createElement('button'); btn.className = 'btn-action'; 
-    btn.textContent = currentCount >= t.max ? 'МАКСИМУМ' : `Нанять (${t.cost} ₴)`;
-    btn.disabled = currentCount >= t.max || G.money < t.cost;
-    btn.onclick = () => { 
-      G.money -= t.cost; G.workers[key]++; 
-      showToast(`${t.name} нанят!`); updateHUD(); saveGame(); openStaff(); 
-    };
-    
-    const item = document.createElement('div'); item.className = 'list-item';
-    item.innerHTML = `<div><b style="color:var(--accent-blue)">${t.name} (${currentCount}/${t.max})</b><br><span style="font-size:11px; color:var(--accent-green)">Доход: +${t.income} ₴/с</span></div>`;
-    item.appendChild(btn); list.appendChild(item);
-  });
-
-  document.getElementById('modal-staff').classList.add('active');
-}
-
-// === УЛУЧШЕНИЯ ===
-function openUpgrades() {
-  const list = document.getElementById('upg-list'); list.innerHTML = '';
-  
-  const upgs = [
-    { id: 'fridge', name: 'Холодильник', desc: 'Открывает премиум-товары (Икра, Элитный алкоголь)', price: 1000 },
-    { id: 'neon', name: 'Неоновая вывеска', desc: 'Увеличивает поток клиентов', price: 800 },
-    { id: 'alarm', name: 'Сигнализация', desc: 'Защищает от ночных краж', price: 1500 }
-  ];
-
-  upgs.forEach(u => {
-    const isBought = G.upgrades[u.id];
-    const btn = document.createElement('button'); btn.className = 'btn-action'; 
-    btn.textContent = isBought ? 'КУПЛЕНО' : `Купить (${u.price} ₴)`;
-    btn.disabled = isBought || G.money < u.price;
-    btn.onclick = () => { G.money -= u.price; G.upgrades[u.id] = true; showToast("Улучшение куплено!"); updateHUD(); saveGame(); openUpgrades(); applyVisualUpgrades(); renderShelves();};
-    
-    const item = document.createElement('div'); item.className = 'list-item';
-    item.innerHTML = `<div><b style="color:${isBought?'var(--accent-green)':'#fff'}">${u.name}</b><br><span style="font-size:11px; color:var(--text-muted)">${u.desc}</span></div>`;
-    item.appendChild(btn); list.appendChild(item);
-  });
-
-  if (!G.upgrades.won) {
-    const winBtn = document.createElement('button'); winBtn.className = 'btn-action'; winBtn.style.background = 'var(--accent-green)'; winBtn.style.color = '#fff';
-    winBtn.textContent = `ВЫКУПИТЬ МАГАЗИН (15 000 ₴)`;
-    winBtn.disabled = G.money < 15000;
-    winBtn.onclick = () => { G.money -= 15000; G.upgrades.won = true; closeModal('modal-upgrades'); document.getElementById('modal-win').classList.add('active'); saveGame(); };
-    
-    const winItem = document.createElement('div'); winItem.className = 'list-item'; winItem.style.borderColor = 'var(--accent-green)'; winItem.style.marginTop = '15px';
-    winItem.innerHTML = `<div><b style="color:var(--accent-green)">ФИНАЛЬНАЯ ЦЕЛЬ</b><br><span style="font-size:11px; color:var(--text-muted)">Стать владельцем помещения</span></div>`;
-    winItem.appendChild(winBtn); list.appendChild(winItem);
-  }
-
-  document.getElementById('modal-upgrades').classList.add('active');
-}
-
-// === МОДАЛЬНЫЕ ОКНА (ОПТ И ДОЛГИ) ===
-function openNotebook() {
-  const list = document.getElementById('debt-list');
-  if (G.debts.length === 0) { list.innerHTML = '<div style="text-align:center; color:#888; margin-top:20px;">Пока должников нет.</div>'; } 
-  else { list.innerHTML = G.debts.map(d => `<div style="display:flex; justify-content:space-between; border-bottom:1px dashed #aaa; padding:5px 0;"><span>${d.name}</span><span style="color:red">${d.amount.toFixed(2)} ₴</span></div>`).join(''); }
-  document.getElementById('modal-notebook').classList.add('active');
-}
-
-function openWholesale() {
-  const list = document.getElementById('ws-list'); list.innerHTML = '';
-  getActiveProds().forEach(p => {
-    const cost = p.wsPrice * 10;
-    const btn = document.createElement('button'); btn.className = 'btn-action'; btn.textContent = `Купить 10 шт (${cost.toFixed(2)} ₴)`;
-    btn.disabled = G.money < cost; btn.onclick = () => { G.money -= cost; G.deliveries.push({ id: p.id, time: G.time + 60 }); showToast("Заказ оформлен!"); updateHUD(); saveGame(); openWholesale(); };
-    const item = document.createElement('div'); item.className = 'list-item';
-    item.innerHTML = `<div><b>${p.name}</b><br><span style="font-size:11px; color:var(--accent-green)">Опт: ${p.wsPrice.toFixed(2)} ₴/шт</span></div>`;
-    item.appendChild(btn); list.appendChild(item);
-  });
-  document.getElementById('modal-wholesale').classList.add('active');
-}
-
-function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
 </script>
 </body>
 </html>
