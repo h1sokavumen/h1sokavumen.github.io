@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QWERTOV INFO</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="glass-card">
+        <div class="card-header">
+            <div class="badge">QWETOV</div>
+            <button type="button" class="contact-button">
+                Контакты
+                <span class="contact-tooltip">
+                    @Dobi29<br>
+                    Email: dwdf3711@gmail.com
+                </span>
+            </button>
+        </div>
+        <h1>Главный портал</h1>
+        <p class="lead">QWETOV — мой ник, и это мой авторский сайт. Здесь собраны мои проекты, музыкальная страница Delimur и главная идея личного бренда.</p>
+        <div class="hero-chips">
+            <span class="chip">1 реальный проект</span>
+            <span class="chip">темный стиль</span>
+            <span class="chip">музыка в фоне</span>
+        </div>
+        <div class="button-row">
+            <button onclick="location.href='qwertov.html'">PROJECT</button>
+            <button onclick="location.href='uslugi.html'" class="button-secondary">Услуги</button>
+            <button onclick="location.href='delimur.html'" class="button-secondary">Delimur Music</button>
+        </div>
+        <div class="feature-grid">
+            <article class="feature-card">
+                <h3>Портфолио</h3>
+                <p>Место, где будут появляться все мои проекты. Сейчас это стартовая страница и первый реальный сайт.</p>
+            </article>
+            <article class="feature-card">
+                <h3>Delimur</h3>
+                <p>Музыкальный ресурс d1nters с живой ссылкой и стильным представлением.</p>
+            </article>
+            <article class="feature-card">
+                <h3>Личность</h3>
+                <p>QWETOV — это мой ник, мой стиль и мой собственный проект в сети.</p>
+            </article>
+        </div>
+    </div>
+    <div class="volume-panel">
+        <span class="volume-label">Громкость</span>
+        <input id="volume-slider" class="slider" type="range" min="0" max="100" value="10" step="1">
+    </div>
+    <audio id="bg-audio" src="Kate_Bush_-_Running_Up_That_Hill_A_Deal_With_God_48002274.mp3" autoplay loop></audio>
+    <script>
+        const audio = document.getElementById('bg-audio');
+        const slider = document.getElementById('volume-slider');
+        const savedVolume = localStorage.getItem('qwetovVolume');
+        const savedTime = localStorage.getItem('qwetovTime');
+
+        audio.volume = savedVolume !== null ? Number(savedVolume) : 0.1;
+        slider.value = Math.round(audio.volume * 100);
+
+        function saveState() {
+            localStorage.setItem('qwetovVolume', audio.volume);
+            localStorage.setItem('qwetovTime', audio.currentTime);
+        }
+
+        audio.addEventListener('loadedmetadata', () => {
+            if (savedTime !== null) {
+                audio.currentTime = Math.min(Number(savedTime), audio.duration || Number(savedTime));
+            }
+            audio.play().catch(() => {});
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            localStorage.setItem('qwetovTime', audio.currentTime);
+        });
+
+        document.addEventListener('click', () => {
+            audio.play().catch(() => {});
+        }, { once: true });
+
+        slider.addEventListener('input', () => {
+            audio.volume = Number(slider.value) / 100;
+            localStorage.setItem('qwetovVolume', audio.volume);
+            audio.play().catch(() => {});
+        });
+
+        window.addEventListener('beforeunload', saveState);
+    </script>
+</body>
+</html>
